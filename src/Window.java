@@ -173,98 +173,20 @@ public class Window {
 
         // ===============================================================================================================
 
-        CustomNumber n1 = new CustomNumber("-10000.");
-        CustomNumber n2 = new CustomNumber("+.0001");
-        CustomNumber n3 = new CustomNumber("-1.1");
+        CustomNumber n1 = new CustomNumber();
+        CustomNumber n2 = new CustomNumber();
+        CustomNumber n3 = new CustomNumber();
         CustomNumber n4 = new CustomNumber();
         CustomNumber n5 = new CustomNumber();
         CustomNumber n6 = new CustomNumber();
         CustomNumber n7 = new CustomNumber();
 
-        /*
-        int tries = 0;
-        while(true) {
-            n1.setValue("2.");
-            n2.setValue("2.");
-            n3.setValue("2.");
-            n4.setValue("2.");
 
-
-            for (int i = 0; i < tries; i++) {
-                n1 = CustomNumberUtils.multiply(n4, n1);
-                //System.out.println(i + " " + n1.generateString());
-            }
-
-
-            for (int i = 0; i < tries; i++) {
-                n2 = CustomNumberUtils.multiply(n2, n4);
-                //System.out.println(i + " " + n2.generateString());
-            }
-
-
-            for (int i = 0; i < tries; i++) {
-                n3 = CustomNumberUtils.addUp(n3, n3);
-                //System.out.println(i + " " + n3.generateString());
-
-            }
-            System.out.println(tries);
-            System.out.println(CustomNumberUtils.areEqual(n1, n2));
-            System.out.println(CustomNumberUtils.areEqual(n2, n3));
-            tries++;
-        }
-        */
-        /*
-        n1.setValue("3.");
-        n2.setValue("3.");
-
-        for(int i = 0; i < 100000; i++)
-        {
-            n1 = CustomNumberUtils.multiply(n2,n1);
-
-            if((i % 25) == 0)
-            {
-                System.out.println(i+" "+n1.generateString());
-            }
-        }
-        */
-
-
-        /*
-        n1.setValue("2.");
-        n2.setValue("2.");
-        for(int i = 0; i < 10000 ; i++) {
-            n2 = CustomNumberUtils.multiply(n2, n1);
-            //System.out.println(n2.generateString());
-            //CustomNumberUtils.print(n2);
-        }
-        System.out.println("done");
-         */
-
-        /*
-        n2.setValue("2.");
-        n1.setValue("1.");
-        CustomNumberUtils.print(n2);
+        n1.setValue("2.11");
+        n2.setValue("2.11");
         n3 = CustomNumberUtils.multiply(n1,n2);
         CustomNumberUtils.print(n3);
-        */
 
-        n1.setValue("2.");
-        n2.setValue("2.1");
 
-        //CustomNumberUtils.print(n3);
-
-        for(int i = 0; i < 500; i++)
-        {
-            n1 = CustomNumberUtils.multiply(n2,n1);
-            System.out.println(i+" "+n1.generateString());
-        }
-        //CustomNumberUtils.print(n3);
-		/*
-
-		System.out.println(CustomNumberUtils.areEqual(testNumber1,testNumber2));
-		System.out.println(CustomNumberUtils.isGreater(testNumber1,testNumber2));
-		System.out.println(CustomNumberUtils.isSmaller(testNumber1,testNumber2));
-		System.out.println(CustomNumberUtils.isGreaterOrEqual(testNumber1,testNumber2));
-		System.out.println(CustomNumberUtils.isSmallerOrEqual(testNumber1,testNumber2)); */
     }
 }
