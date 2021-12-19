@@ -182,8 +182,8 @@ public class Window {
         CustomNumber n7 = new CustomNumber();
 
 
+        n2.setValue("2.21");
         n1.setValue("2.11");
-        n2.setValue("2.11");
         n3 = CustomNumberUtils.multiply(n1,n2);
         CustomNumberUtils.print(n3);
 

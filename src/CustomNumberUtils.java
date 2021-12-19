@@ -455,15 +455,11 @@ public class CustomNumberUtils {
             CustomNumber singleDigitCustomNumber = new CustomNumber();
             if (Faktor2.getDigitArray().get(i) == 0) {
                 multiplicationLineResult.setZero();
-                //System.out.println("@@@@@@@");
-            } else if (Faktor2.getDigitArray().get(i) == 1) {
-                multiplicationLineResult.is(Faktor1);
-                //System.out.println("WWWWWWW");
             } else {
                 singleDigitCustomNumber.setValue(String.valueOf(Faktor2.getDigitArray().get(i)) + ".");
                 multiplicationLineResult = oneDiggitCustomNumberMultiplication(Faktor1, singleDigitCustomNumber);
             }
-            multiplicationLineResult.shiftLeft(Faktor2.getDataLengthTotal() - i - 1);
+            multiplicationLineResult.shiftLeft(Faktor1.getDataLengthTotal() - i - 1);
             returnCustomNumber = internalAddition(returnCustomNumber, multiplicationLineResult);
         }
 
@@ -484,6 +480,8 @@ public class CustomNumberUtils {
       +   738
       ----------
         56088
+
+        Rückgabewerte sind immer ganze Zahlen ohne Nachkommastellen.
     */
 
     private static CustomNumber oneDiggitCustomNumberMultiplication(CustomNumber Faktor1, CustomNumber Faktor2) {
