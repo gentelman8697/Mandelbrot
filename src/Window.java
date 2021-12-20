@@ -182,10 +182,20 @@ public class Window {
         CustomNumber n7 = new CustomNumber();
 
 
-        n2.setValue("2.21");
-        n1.setValue("2.11");
-        n3 = CustomNumberUtils.multiply(n1,n2);
-        CustomNumberUtils.print(n3);
+        n1.setValue("2.");
+        n2.setValue("0.501");
+
+        n1 = CustomNumberUtils.multiply(n2,n1);
+
+        CustomNumberUtils.print(n1);
+
+        n1 = CustomNumberUtils.multiply(n2,n1);
+
+        CustomNumberUtils.print(n1);
+
+        n1 = CustomNumberUtils.multiply(n2,n1);
+
+        CustomNumberUtils.print(n1);
 
 
     }

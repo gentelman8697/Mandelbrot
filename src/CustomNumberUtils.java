@@ -29,7 +29,7 @@ public class CustomNumberUtils {
         return returnCustomNumber;
     }
 
-    public static CustomNumber multiply(CustomNumber Faktor1, CustomNumber Faktor2) {
+    public static CustomNumber oldmultiply(CustomNumber Faktor1, CustomNumber Faktor2) {
         CustomNumber returnCustomNumber = new CustomNumber();
         CustomNumber numberOne = new CustomNumber();
         numberOne.setValue("+1.");
@@ -38,19 +38,81 @@ public class CustomNumberUtils {
             returnCustomNumber.setZero();
         } else if (areDigitArraysEqual(Faktor1, numberOne)) {
             returnCustomNumber.is(Faktor2);
-
             if (Faktor1.getlengthBeforeComman() > 1) {
                 returnCustomNumber.shiftLeft(Faktor1.getlengthBeforeComman() - 1);
             } else if (Faktor1.getlengthBeforeComman() < 1) {
                 returnCustomNumber.shiftRight((Faktor1.getlengthBeforeComman() * -1) + 1);
             }
+
         } else if (areDigitArraysEqual(Faktor2, numberOne)) {
             returnCustomNumber.is(Faktor1);
-
             if (Faktor2.getlengthBeforeComman() > 1) {
                 returnCustomNumber.shiftLeft(Faktor2.getlengthBeforeComman() - 1);
             } else if (Faktor2.getlengthBeforeComman() < 1) {
                 returnCustomNumber.shiftRight((Faktor2.getlengthBeforeComman() * -1) + 1);
+            }
+
+        } else {
+            if (Faktor2.getDataLengthTotal() > Faktor1.getDataLengthTotal()) {
+                returnCustomNumber = internalMultiplication(Faktor2, Faktor1);
+            } else {
+                returnCustomNumber = internalMultiplication(Faktor1, Faktor2);
+            }
+        }
+
+        if (Faktor1.isPositive() != Faktor2.isPositive()) {
+            returnCustomNumber.setNegative();
+        }
+
+        return returnCustomNumber;
+    }
+
+    public static CustomNumber multiply(CustomNumber Faktor1, CustomNumber Faktor2) {
+        CustomNumber returnCustomNumber = new CustomNumber();
+        CustomNumber numberOne = new CustomNumber();
+        numberOne.setValue("+1.");
+
+        if (Faktor1.isZero() || Faktor2.isZero()) {
+            returnCustomNumber.setZero();
+        } else if (Faktor1.getDataLengthTotal() == 1) {
+            switch (Faktor1.getDigitArray().get(0)) {
+                case 1 -> {
+                    returnCustomNumber.is(Faktor2);
+                    if (Faktor1.getlengthBeforeComman() > 1) {
+                        returnCustomNumber.shiftLeft(Faktor1.getlengthBeforeComman() - 1);
+                    } else if (Faktor1.getlengthBeforeComman() < 1) {
+                        returnCustomNumber.shiftRight((Faktor1.getlengthBeforeComman() * -1) + 1);
+                    }
+                }
+                case 2 -> {
+                    returnCustomNumber = addUp(Faktor2, Faktor2);
+                    if (Faktor1.getlengthBeforeComman() > 1) {
+                        returnCustomNumber.shiftLeft(Faktor1.getlengthBeforeComman() - 1);
+                    } else if (Faktor1.getlengthBeforeComman() < 1) {
+                        returnCustomNumber.shiftRight((Faktor1.getlengthBeforeComman() * -1) + 1);
+                    }
+                }
+                default -> returnCustomNumber = internalMultiplication(Faktor2, Faktor1);
+            }
+        } else if (Faktor2.getDataLengthTotal() == 1) {
+            switch (Faktor2.getDigitArray().get(0)) {
+                case 1 -> {
+                    returnCustomNumber.is(Faktor1);
+                    if (Faktor2.getlengthBeforeComman() > 1) {
+                        returnCustomNumber.shiftLeft(Faktor2.getlengthBeforeComman() - 1);
+                    } else if (Faktor2.getlengthBeforeComman() < 1) {
+                        returnCustomNumber.shiftRight((Faktor2.getlengthBeforeComman() * -1) + 1);
+                    }
+                }
+                case 2 -> {
+                    returnCustomNumber = addUp(Faktor1, Faktor1);
+                    if (Faktor2.getlengthBeforeComman() > 1) {
+                        returnCustomNumber.shiftLeft(Faktor2.getlengthBeforeComman() - 1);
+                    } else if (Faktor2.getlengthBeforeComman() < 1) {
+                        returnCustomNumber.shiftRight((Faktor2.getlengthBeforeComman() * -1) + 1);
+                    }
+                }
+                default -> returnCustomNumber = internalMultiplication(Faktor1, Faktor2);
             }
         } else {
             if (Faktor2.getDataLengthTotal() > Faktor1.getDataLengthTotal()) {
@@ -59,12 +121,16 @@ public class CustomNumberUtils {
                 returnCustomNumber = internalMultiplication(Faktor1, Faktor2);
             }
         }
+
         if (Faktor1.isPositive() != Faktor2.isPositive()) {
             returnCustomNumber.setNegative();
         }
 
+        //returnCustomNumber.cleanCustomNumber();
+
         return returnCustomNumber;
     }
+
 
     public static boolean areEqual(CustomNumber Number1, CustomNumber Number2) {
         if (!((Number1.getlengthBeforeComman() == Number2.getlengthBeforeComman()) && (Number1.getlengthAfterComman() == Number2.getlengthAfterComman()) && (Number1.getDataLengthTotal() == Number2.getDataLengthTotal()))) {
@@ -439,6 +505,11 @@ public class CustomNumberUtils {
     private static CustomNumber internalMultiplication(CustomNumber Faktor1, CustomNumber Faktor2) {
         CustomNumber returnCustomNumber = new CustomNumber();
 
+        CustomNumber tempFaktor1 = new CustomNumber();
+        CustomNumber tempFaktor2 = new CustomNumber();
+
+        CustomNumber lineResult = new CustomNumber();
+
         int digitsCountToShiftRight = 0;
         returnCustomNumber.setZero();
 
@@ -450,23 +521,33 @@ public class CustomNumberUtils {
             digitsCountToShiftRight = digitsCountToShiftRight + Faktor2.getlengthAfterComman();
         }
 
-        for (int i = 0; i < Faktor2.getDataLengthTotal(); i++) {
-            CustomNumber multiplicationLineResult = new CustomNumber();
-            CustomNumber singleDigitCustomNumber = new CustomNumber();
-            if (Faktor2.getDigitArray().get(i) == 0) {
-                multiplicationLineResult.setZero();
-            } else {
-                singleDigitCustomNumber.setValue(String.valueOf(Faktor2.getDigitArray().get(i)) + ".");
-                multiplicationLineResult = oneDiggitCustomNumberMultiplication(Faktor1, singleDigitCustomNumber);
-            }
-            multiplicationLineResult.shiftLeft(Faktor1.getDataLengthTotal() - i - 1);
-            returnCustomNumber = internalAddition(returnCustomNumber, multiplicationLineResult);
+        tempFaktor1.is(Faktor1);
+        tempFaktor2.is(Faktor2);
+
+        if (tempFaktor1.getlengthAfterComman() > 0) {
+            tempFaktor1.setLengthBeforeComma(tempFaktor1.getlengthBeforeComman() + tempFaktor1.getlengthAfterComman());
+            tempFaktor1.setLengthAfterComma(0);
+        }
+        if (tempFaktor2.getlengthAfterComman() > 0) {
+            tempFaktor2.setLengthBeforeComma(tempFaktor2.getlengthBeforeComman() + tempFaktor2.getlengthAfterComman());
+            tempFaktor2.setLengthAfterComma(0);
         }
 
+        for (int i = 0; i < tempFaktor2.getlengthBeforeComman(); i++) {
+
+            switch (tempFaktor2.getDigitArray().get(i)) {
+                case 0 -> lineResult.setZero();
+                case 1 -> lineResult.is(tempFaktor1);
+                case 2 -> lineResult = internalAddition(tempFaktor1, tempFaktor1);
+                default -> lineResult = oneDiggitCustomNumberMultiplication(tempFaktor1, tempFaktor2.getDigitArray().get(i));
+            }
+
+            lineResult.shiftLeft(tempFaktor2.getlengthBeforeComman() - i - 1);
+            returnCustomNumber = internalAddition(lineResult, returnCustomNumber);
+        }
         if (digitsCountToShiftRight > 0) {
             returnCustomNumber.shiftRight(digitsCountToShiftRight);
         }
-
         return returnCustomNumber;
     }
 
@@ -484,21 +565,22 @@ public class CustomNumberUtils {
         Rückgabewerte sind immer ganze Zahlen ohne Nachkommastellen.
     */
 
-    private static CustomNumber oneDiggitCustomNumberMultiplication(CustomNumber Faktor1, CustomNumber Faktor2) {
+    private static CustomNumber oneDiggitCustomNumberMultiplication(CustomNumber Faktor, byte DigitFaktor) {
         CustomNumber returnCustomNumber = new CustomNumber();
-        if (Faktor1.isZero() || Faktor2.isZero()) {
+        if (Faktor.isZero() || DigitFaktor == 0) {
             returnCustomNumber.setZero();
         } else {
-            while (Faktor1.getDigitArray().size() < Faktor1.getlengthBeforeComman()) {
-                Faktor1.getDigitArray().add(Faktor1.getDigitArray().size(), (byte) 0);
-                Faktor1.lengthAfterComma += 1;
+
+            while (Faktor.getDigitArray().size() < Faktor.getlengthBeforeComman()) {
+                Faktor.getDigitArray().add(Faktor.getDigitArray().size(), (byte) 0);
+                Faktor.lengthAfterComma += 1;
             }
 
             byte carry = 0;
-            for (int i = Faktor1.getDataLengthTotal() - 1; i >= 0 || carry != 0; i--) {
+            for (int i = Faktor.getDataLengthTotal() - 1; i >= 0 || carry != 0; i--) {
                 byte tempDigitResult = 0;
                 byte digitResult = 0;
-                tempDigitResult = (byte) (Faktor1.getDigitArray().get(i) * Faktor2.getDigitArray().get(0) + carry);
+                tempDigitResult = (byte) (Faktor.getDigitArray().get(i) * DigitFaktor + carry);
                 digitResult = (byte) ((tempDigitResult) % 10);
                 carry = (byte) (tempDigitResult / 10);
 
