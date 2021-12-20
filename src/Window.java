@@ -181,16 +181,7 @@ public class Window {
         CustomNumber n6 = new CustomNumber();
         CustomNumber n7 = new CustomNumber();
 
-        CustomNumberUtils.test(50);
-        /*
-        n2.setValue("1.");
-        n1.setValue("0.5");
-
-        for(int i = 0; i < 1000 ; i++) {
-            n1 = CustomNumberUtils.multiply(n1, n1);
-            System.out.println(n1.generateString());
-        }
-        */
+        CustomNumberUtils.test(35);
 
     }
 }

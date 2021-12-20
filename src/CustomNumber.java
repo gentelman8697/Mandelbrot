@@ -138,7 +138,10 @@ public class CustomNumber {
     }
 
     public void is(CustomNumber Number) {
-        setValue(Number.generateString());
+        sign = Number.isPositive();
+        lengthBeforeComma = Number.getlengthBeforeComma();
+        lengthAfterComma = Number.getlengthAfterComma();
+        digitArray = new ArrayList<Byte>(Number.getDigitArray());
     }
 
     public boolean isNegative() {
@@ -150,7 +153,7 @@ public class CustomNumber {
     }
 
     public boolean isZero() {
-        return ((lengthBeforeComma + lengthAfterComma) == 0 || digitArray.size() == 0 );
+        return ((lengthBeforeComma + lengthAfterComma) == 0 || digitArray.size() == 0);
     }
 
     public void printDiggitArray() {

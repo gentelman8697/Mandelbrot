@@ -1,3 +1,4 @@
+import javax.sound.midi.Soundbank;
 import java.util.Objects;
 
 public class CustomNumberUtils {
@@ -365,36 +366,43 @@ public class CustomNumberUtils {
         CustomNumber returnCustomNumber = new CustomNumber();
         byte carry = 0;
 
-        Minuend.evenOutNumbers(Subtrahend);
-        Subtrahend.evenOutNumbers(Minuend);
-        byte tempDigitResult = 0;
-        for (int i = Minuend.getDigitArray().size() - 1; i >= 0; i--) {
-            if ((Subtrahend.getDigitArray().get(i) + carry) <= (Minuend.getDigitArray().get(i))) {
-                tempDigitResult = (byte) (Minuend.getDigitArray().get(i) - (Subtrahend.getDigitArray().get(i) + carry));
-                carry = 0;
-                //System.out.println("norm:  " + tempDigitResult);
+        if(!Subtrahend.isZero()) {
+            Minuend.evenOutNumbers(Subtrahend);
+            Subtrahend.evenOutNumbers(Minuend);
+            byte tempDigitResult = 0;
+            for (int i = Minuend.getDigitArray().size() - 1; i >= 0; i--) {
+                if ((Subtrahend.getDigitArray().get(i) + carry) <= (Minuend.getDigitArray().get(i))) {
+                    tempDigitResult = (byte) (Minuend.getDigitArray().get(i) - (Subtrahend.getDigitArray().get(i) + carry));
+                    carry = 0;
+                    //System.out.println("norm:  " + tempDigitResult);
+                }
+                if ((Subtrahend.getDigitArray().get(i) + carry) > (Minuend.getDigitArray().get(i))) {
+                    tempDigitResult = (byte) ((Minuend.getDigitArray().get(i) + (byte) 10) - (Subtrahend.getDigitArray().get(i) + carry));
+                    carry = 1;
+                    //System.out.println("carry: " + tempDiggitResult);
+                }
+
+                returnCustomNumber.appendDataDigit(tempDigitResult, "l");
+                //System.out.println(Minuend.getDigitArray().get(i));
+
             }
-            if ((Subtrahend.getDigitArray().get(i) + carry) > (Minuend.getDigitArray().get(i))) {
-                tempDigitResult = (byte) ((Minuend.getDigitArray().get(i) + (byte) 10) - (Subtrahend.getDigitArray().get(i) + carry));
-                carry = 1;
-                //System.out.println("carry: " + tempDiggitResult);
+
+            if (Minuend.getlengthAfterComma() > 0) {
+                returnCustomNumber.shiftRight(Minuend.getlengthAfterComma());
+            }
+            if (Minuend.getlengthAfterComma() < 0) {
+                returnCustomNumber.shiftLeft(Minuend.getlengthAfterComma() * -1);
             }
 
-            returnCustomNumber.appendDataDigit(tempDigitResult, "l");
-            //System.out.println(Minuend.getDigitArray().get(i));
-
+            Minuend.cleanCustomNumber();
+            Subtrahend.cleanCustomNumber();
+            returnCustomNumber.cleanCustomNumber();
+        }
+        else
+        {
+            returnCustomNumber.is(Minuend);
         }
 
-        if (Minuend.getlengthAfterComma() > 0) {
-            returnCustomNumber.shiftRight(Minuend.getlengthAfterComma());
-        }
-        if (Minuend.getlengthAfterComma() < 0) {
-            returnCustomNumber.shiftLeft(Minuend.getlengthAfterComma() * -1);
-        }
-
-        Minuend.cleanCustomNumber();
-        Subtrahend.cleanCustomNumber();
-        returnCustomNumber.cleanCustomNumber();
         return returnCustomNumber;
     }
 
@@ -433,18 +441,10 @@ public class CustomNumberUtils {
             }
         } else {
             if (Summand2.isZero() && !Summand1.isZero()) {
-                returnCustomNumber.setLengthBeforeComma(Summand1.getlengthBeforeComma());
-                returnCustomNumber.setLengthAfterComma(Summand1.getlengthAfterComma());
-                for (int i = 0; i < Summand1.getDataLengthTotal(); i++) {
-                    returnCustomNumber.digitArray.add(Summand1.getDigitArray().get(i));
-                }
+                returnCustomNumber.is(Summand1);
             }
             if (Summand1.isZero() && !Summand2.isZero()) {
-                returnCustomNumber.setLengthBeforeComma(Summand2.getlengthBeforeComma());
-                returnCustomNumber.setLengthAfterComma(Summand2.getlengthAfterComma());
-                for (int i = 0; i < Summand2.getDataLengthTotal(); i++) {
-                    returnCustomNumber.digitArray.add(Summand2.getDigitArray().get(i));
-                }
+                returnCustomNumber.is(Summand2);
             }
             if (Summand1.isZero() && Summand2.isZero()) {
                 returnCustomNumber.setZero();
@@ -579,7 +579,7 @@ public class CustomNumberUtils {
                 }
             }
         }
-
+        System.out.println("No Error in occurred while testing!");
     }
 
     private static boolean testCase(CustomNumber CtValA, CustomNumber CtValB, double DbValA, double DbValB) {
