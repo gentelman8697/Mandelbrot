@@ -13,8 +13,8 @@ public class CustomNumber {
         sign = true;
     }
 
-    public CustomNumber(String inputString) {
-        setValue(inputString);
+    public CustomNumber(String InputString) {
+        setValue(InputString);
     }
 
     public void appendDataDigit(byte digit, String position) {
@@ -63,13 +63,13 @@ public class CustomNumber {
         }
     }
 
-    public void evenOutNumbers(CustomNumber evenOutNumber) {
-        while (evenOutNumber.getlengthBeforeComman() > lengthBeforeComma) {
+    public void evenOutNumbers(CustomNumber EvenOutNumber) {
+        while (EvenOutNumber.getlengthBeforeComma() > lengthBeforeComma) {
             digitArray.add(0, (byte) 0);
             lengthBeforeComma = lengthBeforeComma + 1;
 
         }
-        while (evenOutNumber.getlengthAfterComman() > lengthAfterComma) {
+        while (EvenOutNumber.getlengthAfterComma() > lengthAfterComma) {
             digitArray.add(getDataLengthTotal(), (byte) 0);
             lengthAfterComma = lengthAfterComma + 1;
         }
@@ -121,11 +121,11 @@ public class CustomNumber {
         return digitArray;
     }
 
-    public int getlengthAfterComman() {
+    public int getlengthAfterComma() {
         return lengthAfterComma;
     }
 
-    public int getlengthBeforeComman() {
+    public int getlengthBeforeComma() {
         return lengthBeforeComma;
     }
 
@@ -164,9 +164,9 @@ public class CustomNumber {
     }
 
 
-    public void removeDataDigit(String position) {
+    public void removeDataDigit(String Position) {
         if (!isZero()) {
-            String charAt = position.substring(0, 1);
+            String charAt = Position.substring(0, 1);
             if (charAt.equals("L") || charAt.equals("l") || charAt.equals("B") || charAt.equals("b")) {
                 digitArray.remove(0);
                 lengthBeforeComma -= 1;
@@ -180,12 +180,12 @@ public class CustomNumber {
         }
     }
 
-    public void setLengthAfterComma(int length) {
-        lengthAfterComma = length;
+    public void setLengthAfterComma(int Length) {
+        lengthAfterComma = Length;
     }
 
-    public void setLengthBeforeComma(int length) {
-        lengthBeforeComma = length;
+    public void setLengthBeforeComma(int Length) {
+        lengthBeforeComma = Length;
     }
 
     public void setNegative() {
@@ -200,38 +200,38 @@ public class CustomNumber {
         sign = singVar;
     }
 
-    public void setValue(String inputString) {
+    public void setValue(String InputString) {
         int lengthTotal;
-        if ((inputString.charAt(0) == '+' || inputString.charAt(0) == '-') && inputString.length() > 1) {
-            if (inputString.charAt(0) == '+') {
+        if ((InputString.charAt(0) == '+' || InputString.charAt(0) == '-') && InputString.length() > 1) {
+            if (InputString.charAt(0) == '+') {
                 sign = true;
             }
-            if (inputString.charAt(0) == '-') {
+            if (InputString.charAt(0) == '-') {
                 sign = false;
             }
-            inputString = inputString.substring(1);
+            InputString = InputString.substring(1);
         } else {
             sign = true;
         }
 
-        inputString = inputString.replaceFirst("^0+(?!$)", "");
-        if (inputString.length() > 0) {
-            while (inputString.endsWith("0")) {
-                inputString = inputString.substring(0, inputString.length() - 1);
+        InputString = InputString.replaceFirst("^0+(?!$)", "");
+        if (InputString.length() > 0) {
+            while (InputString.endsWith("0")) {
+                InputString = InputString.substring(0, InputString.length() - 1);
             }
         }
 
-        if (inputString.equals(".")) {
+        if (InputString.equals(".")) {
             setZero();
         } else {
             eraseDigitArray();
-            lengthBeforeComma = inputString.indexOf(".");
+            lengthBeforeComma = InputString.indexOf(".");
 
-            lengthTotal = inputString.length() - 1;
+            lengthTotal = InputString.length() - 1;
             lengthAfterComma = lengthTotal - lengthBeforeComma;
 
             for (int i = 0; i < lengthBeforeComma; i++) {
-                char k = inputString.charAt(i);
+                char k = InputString.charAt(i);
                 String j = String.valueOf(k);
                 if (j.equals("*")) {
                     digitArray.add((byte) 0);
@@ -242,7 +242,7 @@ public class CustomNumber {
             }
 
             for (int b = lengthBeforeComma + 1; b < lengthTotal + 1; b++) {
-                char k = inputString.charAt(b);
+                char k = InputString.charAt(b);
                 String j = String.valueOf(k);
                 if (j.equals("*")) {
                     digitArray.add((byte) 0);
@@ -270,10 +270,10 @@ public class CustomNumber {
         }
     }
 
-    public void shiftLeft(int iterations) {
+    public void shiftLeft(int Iterations) {
         if (!isZero()) {
-            lengthBeforeComma += iterations;
-            lengthAfterComma -= iterations;
+            lengthBeforeComma += Iterations;
+            lengthAfterComma -= Iterations;
         } else {
             setZero();
         }
@@ -288,10 +288,10 @@ public class CustomNumber {
         }
     }
 
-    public void shiftRight(int iterations) {
+    public void shiftRight(int Iterations) {
         if (!isZero()) {
-            lengthBeforeComma -= iterations;
-            lengthAfterComma += iterations;
+            lengthBeforeComma -= Iterations;
+            lengthAfterComma += Iterations;
         } else {
             setZero();
         }

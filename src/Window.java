@@ -181,7 +181,7 @@ public class Window {
         CustomNumber n6 = new CustomNumber();
         CustomNumber n7 = new CustomNumber();
 
-        CustomNumberUtils.test(5);
+        CustomNumberUtils.test(50);
         /*
         n2.setValue("1.");
         n1.setValue("0.5");
