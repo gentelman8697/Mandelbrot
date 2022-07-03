@@ -180,19 +180,11 @@ public class Window {
         CustomNumber n5 = new CustomNumber();
         CustomNumber n6 = new CustomNumber();
         CustomNumber n7 = new CustomNumber();
-        CustomNumberUtils.test(35);
+        //CustomNumberUtils.test(35);
 
-        /*
-        n1.setValue("1.");
-        n2.setValue("1.");
-        n3.setValue("1.");
-
-        for(int i = 0; i < 10000; i++)
-        {
-            n1 = CustomNumberUtils.multiply(n1,n2);
-            n2 = CustomNumberUtils.addUp(n2,n3);
-            CustomNumberUtils.print(n1);
-        }
-        */
+        n1.setValue("160.");
+        n2.setValue("2.");
+        n3 = CustomNumberUtils.divide(n1,n2);
+        CustomNumberUtils.print(n3);
     }
 }

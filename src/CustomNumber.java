@@ -71,8 +71,8 @@ public class CustomNumber {
             lengthAfterComma = lengthAfterComma + 1;
         }
     }
-
-    public String generateString() {
+    @Override
+    public String toString() {
         StringBuilder returnString = new StringBuilder();
 
         for (int i = 0; i < getDataLength(); i++) {
@@ -331,6 +331,15 @@ public class CustomNumber {
     public void decLAC() {
         if (!isZero()) {
             lengthAfterComma -= 1;
+        }
+    }
+
+    public void setPhantomZeros() {
+        if (isZero()) {
+            while (lengthAfterComma < 0) {
+                digitArray.add(digitArray.size(), (byte) 0);
+                lengthAfterComma += 1;
+            }
         }
     }
 }

@@ -13,7 +13,8 @@ public class CustomNumberUtils {
         System.out.println("Stellen nach dem Komma: " + numberToPrint.getLAC());
         System.out.println("Position des Kommas:    nach der " + numberToPrint.getLBC() + ". Ziffer");
         System.out.println("Anzahl der Ziffern:     " + numberToPrint.getDataLength());
-        System.out.println("Zahl:                   " + numberToPrint.generateString());
+
+        System.out.println("Zahl:                   " + numberToPrint.toString());
         System.out.println("-------------------------------------------------------");
     }
 
@@ -36,7 +37,7 @@ public class CustomNumberUtils {
             returnCustomNumber.setZero();
         } else if (factor1.getDataLength() == 1) {
             switch (factor1.getDigitArray().get(0)) {
-                case (byte)1 -> {
+                case (byte) 1 -> {
                     returnCustomNumber.set(factor2);
                     if (factor1.getLBC() > 1) {
                         returnCustomNumber.shiftLeft(factor1.getLBC() - 1);
@@ -44,7 +45,7 @@ public class CustomNumberUtils {
                         returnCustomNumber.shiftRight((factor1.getLBC() * -1) + 1);
                     }
                 }
-                case (byte)2 -> {
+                case (byte) 2 -> {
                     returnCustomNumber = addUp(factor2, factor2);
                     if (factor1.getLBC() > 1) {
                         returnCustomNumber.shiftLeft(factor1.getLBC() - 1);
@@ -56,7 +57,7 @@ public class CustomNumberUtils {
             }
         } else if (factor2.getDataLength() == 1) {
             switch (factor2.getDigitArray().get(0)) {
-                case (byte)1 -> {
+                case (byte) 1 -> {
                     returnCustomNumber.set(factor1);
                     if (factor2.getLBC() > 1) {
                         returnCustomNumber.shiftLeft(factor2.getLBC() - 1);
@@ -64,7 +65,7 @@ public class CustomNumberUtils {
                         returnCustomNumber.shiftRight((factor2.getLBC() * -1) + 1);
                     }
                 }
-                case (byte)2 -> {
+                case (byte) 2 -> {
                     returnCustomNumber = addUp(factor1, factor1);
                     if (factor2.getLBC() > 1) {
                         returnCustomNumber.shiftLeft(factor2.getLBC() - 1);
@@ -84,9 +85,7 @@ public class CustomNumberUtils {
 
         if (factor1.isPos() != factor2.isPos()) {
             returnCustomNumber.setNeg();
-        }
-        else
-        {
+        } else {
             returnCustomNumber.setPos();
         }
         return returnCustomNumber;
@@ -94,12 +93,9 @@ public class CustomNumberUtils {
 
 
     public static boolean areEqual(CustomNumber number1, CustomNumber number2) {
-        if (!((number1.getLBC() == number2.getLBC()) && (number1.getLAC() == number2.getLAC()) && (number1.getDataLength() == number2.getDataLength()))) {
+        if (!((number1.isPos() == number2.isPos()) && (number1.getLBC() == number2.getLBC()) && (number1.getLAC() == number2.getLAC()) && (number1.getDataLength() == number2.getDataLength()))) {
             return false;
         }
-
-        if (number1.isPos() == number2.isNeg())
-            return false;
 
         for (int i = 0; i < number1.getDataLength(); i++)
             if (!Objects.equals(number1.getDigitArray().get(i), number2.getDigitArray().get(i))) {
@@ -351,7 +347,7 @@ public class CustomNumberUtils {
         CustomNumber returnCustomNumber = new CustomNumber();
         byte carry = 0;
 
-        if(!subtrahend.isZero()) {
+        if (!subtrahend.isZero()) {
             minuend.evenOut(subtrahend);
             subtrahend.evenOut(minuend);
             byte tempDigitResult = 0;
@@ -378,9 +374,7 @@ public class CustomNumberUtils {
             minuend.clean();
             subtrahend.clean();
             returnCustomNumber.clean();
-        }
-        else
-        {
+        } else {
             returnCustomNumber.set(minuend);
         }
 
@@ -502,14 +496,14 @@ public class CustomNumberUtils {
     */
 
     private static CustomNumber oneDigitCustomNumberMultiplication(CustomNumber factor, byte digitFactor) {
-        CustomNumber returnCustomNumber = new CustomNumber();
+        CustomNumber retCustomNumber = new CustomNumber();
         if (factor.isZero() || digitFactor == 0) {
-            returnCustomNumber.setZero();
+            retCustomNumber.setZero();
         } else {
 
             while (factor.getDigitArray().size() < factor.getLBC()) {
                 factor.getDigitArray().add(factor.getDigitArray().size(), (byte) 0);
-                factor.setLAC(factor.getLAC()+1);
+                factor.setLAC(factor.getLAC() + 1);
             }
 
             byte carry = 0;
@@ -520,16 +514,108 @@ public class CustomNumberUtils {
                 digitResult = (byte) ((tempDigitResult) % 10);
                 carry = (byte) (tempDigitResult / 10);
 
-                returnCustomNumber.appendDigit(digitResult, "L");
+                retCustomNumber.appendDigit(digitResult, "L");
                 if (i == 0 && carry != 0) {
-                    returnCustomNumber.getDigitArray().add(0, carry);
-                    returnCustomNumber.incLBC();
+                    retCustomNumber.getDigitArray().add(0, carry);
+                    retCustomNumber.incLBC();
                     carry = 0;
                 }
             }
         }
-        return returnCustomNumber;
+        return retCustomNumber;
     }
+
+    public static CustomNumber divide(CustomNumber dividend, CustomNumber divisor) {
+        CustomNumber retCustomNumber = new CustomNumber();
+
+        print(dividend);
+        print(divisor);
+
+
+        if (divisor.isZero()) {
+            throw new RuntimeException("STOP YOU VIOLATED THE LAW !");
+        } else if (dividend.isZero()) {
+            retCustomNumber.setZero();
+            return retCustomNumber;
+        } else if (areEqual(dividend, divisor)) {
+            retCustomNumber.setValue("+1.");
+            return retCustomNumber;
+        } else if (isSmaller(dividend, divisor)) {
+            CustomNumber workDividend = new CustomNumber();
+            CustomNumber workDivisor = new CustomNumber();
+            workDividend.set(dividend);
+            workDivisor.set(divisor);
+            int maxAfter = Math.max(dividend.getLAC(), divisor.getLAC());
+            workDividend.shiftLeft(maxAfter);
+            workDivisor.shiftLeft(maxAfter);
+            workDividend.setPhantomZeros();
+            workDivisor.setPhantomZeros();
+
+            while (isGreater(workDividend, workDivisor)) {
+                workDividend.appendDigit((byte) 0, "R");
+            }
+
+            byte addVal = 0;
+            int count = 0;
+
+            while (count < 100) {
+                while (isGreaterOrEqual(workDividend, workDivisor)) {
+                    workDividend = subTr(workDividend, workDivisor);
+                    addVal++;
+                }
+                retCustomNumber.appendDigit(addVal, "R");
+                if (workDividend.isZero()) {
+                    break;
+                }
+                workDividend.appendDigit((byte) 0, "R");
+                workDividend.shiftLeft();
+                addVal = 0;
+                count++;
+
+            }
+            retCustomNumber.shiftLeft();
+        } else {
+            CustomNumber workDividend = new CustomNumber();
+            CustomNumber workDivisor = new CustomNumber();
+            workDividend.set(dividend);
+            workDivisor.set(divisor);
+            int maxAfter = Math.max(dividend.getLAC(), divisor.getLAC());
+            workDividend.shiftLeft(maxAfter);
+            workDivisor.shiftLeft(maxAfter);
+            workDividend.setPhantomZeros();
+            workDivisor.setPhantomZeros();
+
+            int diff = dividend.getDataLength() - divisor.getDataLength();
+
+            CustomNumber tempDividend = new CustomNumber();
+            tempDividend.set(workDividend);
+
+            for (int i = 0; i < diff; i++) {
+                tempDividend.removeDataDigit("R");
+            }
+
+            tempDividend.shiftRight(diff);
+
+            byte addVal = 0;
+            int count = 0;
+
+            //TODO hier
+
+            for(int i = 0; i <= diff; i++)
+            {
+                while(isGreaterOrEqual(tempDividend,workDivisor))
+                {
+                    tempDividend = subTr(tempDividend,workDivisor);
+                    addVal++;
+                }
+                retCustomNumber.appendDigit(addVal,"R");
+                tempDividend.appendDigit(workDividend.getDigitArray().get(workDividend.getDataLength()-diff),"R");
+                tempDividend.shiftLeft();
+            }
+        }
+        return retCustomNumber;
+    }
+
 
     public static void test(int iterations) {
         CustomNumber ctValA = new CustomNumber();
@@ -537,18 +623,14 @@ public class CustomNumberUtils {
         double dbValA;
         double dbValB;
 
-        for(double i = iterations * -1; i <= iterations;i+=1)
-        {
-            for(double k = iterations * -1; k <= iterations; k+= 1)
-            {
-                for(double j = iterations * -1; j <= iterations; j+= 1)
-                {
+        for (double i = iterations * -1; i <= iterations; i += 1) {
+            for (double k = iterations * -1; k <= iterations; k += 1) {
+                for (double j = iterations * -1; j <= iterations; j += 1) {
                     dbValA = j + i;
                     dbValB = k - i;
                     ctValA.setValue(String.valueOf(dbValA));
                     ctValB.setValue(String.valueOf(dbValB));
-                    if(!testCase(ctValA,ctValB,dbValA,dbValB))
-                    {
+                    if (!testCase(ctValA, ctValB, dbValA, dbValB)) {
                         System.out.println(i);
                         System.out.println(k);
                         System.out.println(j);
@@ -569,7 +651,7 @@ public class CustomNumberUtils {
         dbValRes = dbValA + dbValB;
 
         ctDbTempRes.setValue(String.valueOf(dbValRes));
-        if (!ctValRes.generateString().equals(ctDbTempRes.generateString())) {
+        if (!ctValRes.toString().equals(ctDbTempRes.toString())) {
             testCaseErrorMessage(ctValRes, ctDbTempRes, dbValRes, ctValA, ctValB, dbValA, dbValB);
             return false;
         }
@@ -578,7 +660,7 @@ public class CustomNumberUtils {
         dbValRes = dbValA - dbValB;
 
         ctDbTempRes.setValue(String.valueOf(dbValRes));
-        if (!ctValRes.generateString().equals(ctDbTempRes.generateString())) {
+        if (!ctValRes.toString().equals(ctDbTempRes.toString())) {
             testCaseErrorMessage(ctValRes, ctDbTempRes, dbValRes, ctValA, ctValB, dbValA, dbValB);
             return false;
         }
@@ -587,7 +669,7 @@ public class CustomNumberUtils {
         dbValRes = dbValA * dbValB;
 
         ctDbTempRes.setValue(String.valueOf(dbValRes));
-        if (!ctValRes.generateString().equals(ctDbTempRes.generateString())) {
+        if (!ctValRes.toString().equals(ctDbTempRes.toString())) {
             testCaseErrorMessage(ctValRes, ctDbTempRes, dbValRes, ctValA, ctValB, dbValA, dbValB);
             return false;
         }
@@ -608,7 +690,7 @@ public class CustomNumberUtils {
         dbValRes = tmpDbValA * tmpDbValB;
 
         ctDbTempRes.setValue(String.valueOf(dbValRes));
-        if (!ctValRes.generateString().equals(ctDbTempRes.generateString())) {
+        if (!ctValRes.toString().equals(ctDbTempRes.toString())) {
             testCaseErrorMessage(ctValRes, ctDbTempRes, dbValRes, tmpCtValA, tmpCtValB, tmpDbValA, tmpDbValB);
             return false;
         }
@@ -618,8 +700,8 @@ public class CustomNumberUtils {
     private static void testCaseErrorMessage(CustomNumber ctValRes, CustomNumber ctDbTempRes, double dbValRes, CustomNumber ctValA, CustomNumber ctValB, double dbValA, double dbValB) {
         System.out.println("========================= ERROR =========================");
         System.out.println("Compared Strings:");
-        System.out.println("ct:    " + ctValRes.generateString());
-        System.out.println("ctTmp: " + ctDbTempRes.generateString());
+        System.out.println("ct:    " + ctValRes.toString());
+        System.out.println("ctTmp: " + ctDbTempRes.toString());
         System.out.println("db:    " + String.valueOf(dbValRes));
         System.out.println("Custom Number Calculated Value: ");
         print(ctValRes);
