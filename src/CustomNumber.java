@@ -2,10 +2,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CustomNumber {
-    /* private */ int lengthBeforeComma;
-    /* private */ int lengthAfterComma;
-    /* private */ boolean sign;
-    List<Byte> digitArray = new ArrayList<Byte>();
+    private int lengthBeforeComma;
+    private int lengthAfterComma;
+    private boolean sign;
+    private List<Byte> digitArray = new ArrayList<Byte>();
 
     public CustomNumber() {
         lengthBeforeComma = 0;
@@ -17,12 +17,11 @@ public class CustomNumber {
         setValue(InputString);
     }
 
-    public void appendDataDigit(byte digit, String position) {
+    public void appendDigit(byte digit, String position) {
         String charAt = position.substring(0, 1);
         if (charAt.equals("L") || charAt.equals("l") || charAt.equals("B") || charAt.equals("b")) {
             digitArray.add(0, digit);
             lengthBeforeComma = lengthBeforeComma + 1;
-
         }
         if (charAt.equals("R") || charAt.equals("r") || charAt.equals("A") || charAt.equals("a")) {
             digitArray.add(digitArray.size(), digit);
@@ -30,7 +29,7 @@ public class CustomNumber {
         }
     }
 
-    public void cleanCustomNumber() {
+    public void clean() {
         if (!isZero()) {
             int reduceBefore = 0;
             int reduceAfter = 0;
@@ -57,20 +56,18 @@ public class CustomNumber {
         }
     }
 
-    public void eraseDigitArray() {
-        for (int i = 0; i < digitArray.size(); ) {
-            digitArray.remove(0);
-        }
+    private void eraseDigitArray() {
+        digitArray = new ArrayList<>();
     }
 
-    public void evenOutNumbers(CustomNumber EvenOutNumber) {
-        while (EvenOutNumber.getlengthBeforeComma() > lengthBeforeComma) {
+    public void evenOut(CustomNumber evenOutNumber) {
+        while (evenOutNumber.lengthBeforeComma > lengthBeforeComma) {
             digitArray.add(0, (byte) 0);
             lengthBeforeComma = lengthBeforeComma + 1;
 
         }
-        while (EvenOutNumber.getlengthAfterComma() > lengthAfterComma) {
-            digitArray.add(getDataLengthTotal(), (byte) 0);
+        while (evenOutNumber.lengthAfterComma > lengthAfterComma) {
+            digitArray.add(getDataLength(), (byte) 0);
             lengthAfterComma = lengthAfterComma + 1;
         }
     }
@@ -78,7 +75,7 @@ public class CustomNumber {
     public String generateString() {
         StringBuilder returnString = new StringBuilder();
 
-        for (int i = 0; i < getDataLengthTotal(); i++) {
+        for (int i = 0; i < getDataLength(); i++) {
             byte k = digitArray.get(i);
             String j = String.valueOf(k);
             returnString.append(j);
@@ -87,9 +84,7 @@ public class CustomNumber {
         if (lengthBeforeComma < 0 || lengthAfterComma < 0) {
 
             if (lengthAfterComma < 0) {
-                for (int i = 0; i < (lengthAfterComma * -1); i++) {
-                    returnString.append("*");
-                }
+                returnString.append("*".repeat(Math.max(0, (lengthAfterComma * -1))));
                 returnString.append(".");
             }
 
@@ -101,11 +96,11 @@ public class CustomNumber {
             }
         } else {
             String b = returnString.substring(0, lengthBeforeComma);
-            String c = returnString.substring(lengthBeforeComma, getDataLengthTotal());
+            String c = returnString.substring(lengthBeforeComma, getDataLength());
             returnString = new StringBuilder(b + "." + c);
         }
 
-        if (isPositive() || isZero()) {
+        if (isPos() || isZero()) {
             returnString.insert(0, "+");
         } else {
             returnString.insert(0, "-");
@@ -113,7 +108,7 @@ public class CustomNumber {
         return returnString.toString();
     }
 
-    public int getDataLengthTotal() {
+    public int getDataLength() {
         return lengthBeforeComma + lengthAfterComma;
     }
 
@@ -121,11 +116,11 @@ public class CustomNumber {
         return digitArray;
     }
 
-    public int getlengthAfterComma() {
+    public int getLAC() {
         return lengthAfterComma;
     }
 
-    public int getlengthBeforeComma() {
+    public int getLBC() {
         return lengthBeforeComma;
     }
 
@@ -137,18 +132,18 @@ public class CustomNumber {
         }
     }
 
-    public void is(CustomNumber Number) {
-        sign = Number.isPositive();
-        lengthBeforeComma = Number.getlengthBeforeComma();
-        lengthAfterComma = Number.getlengthAfterComma();
-        digitArray = new ArrayList<Byte>(Number.getDigitArray());
+    public void set(CustomNumber number) {
+        sign = number.isPos();
+        lengthBeforeComma = number.lengthBeforeComma;
+        lengthAfterComma = number.lengthAfterComma;
+        digitArray = new ArrayList<>(number.digitArray);
     }
 
-    public boolean isNegative() {
+    public boolean isNeg() {
         return !sign;
     }
 
-    public boolean isPositive() {
+    public boolean isPos() {
         return sign;
     }
 
@@ -156,20 +151,19 @@ public class CustomNumber {
         return ((lengthBeforeComma + lengthAfterComma) == 0 || digitArray.size() == 0);
     }
 
-    public void printDiggitArray() {
-        String diggitArrayString = "";
-        for (int i = 0; i < getDataLengthTotal(); i++) {
+    public void printDigitArray() {
+        StringBuilder retString = new StringBuilder();
+        for (int i = 0; i < getDataLength(); i++) {
             byte k = digitArray.get(i);
             String j = String.valueOf(k);
-            diggitArrayString = diggitArrayString + j;
+            retString.append(j);
         }
-        System.out.println("DiggitArrayString: " + diggitArrayString);
+        System.out.println("DigitArrayString: " + retString);
     }
 
-
-    public void removeDataDigit(String Position) {
+    public void removeDataDigit(String pos) {
         if (!isZero()) {
-            String charAt = Position.substring(0, 1);
+            String charAt = pos.substring(0, 1);
             if (charAt.equals("L") || charAt.equals("l") || charAt.equals("B") || charAt.equals("b")) {
                 digitArray.remove(0);
                 lengthBeforeComma -= 1;
@@ -177,25 +171,25 @@ public class CustomNumber {
             }
             if (charAt.equals("R") || charAt.equals("r") || charAt.equals("A") || charAt.equals("a")) {
 
-                digitArray.remove(getDataLengthTotal() - 1);
+                digitArray.remove(getDataLength() - 1);
                 lengthAfterComma -= 1;
             }
         }
     }
 
-    public void setLengthAfterComma(int Length) {
-        lengthAfterComma = Length;
+    public void setLAC(int length) {
+        lengthAfterComma = length;
     }
 
-    public void setLengthBeforeComma(int Length) {
-        lengthBeforeComma = Length;
+    public void setLBC(int length) {
+        lengthBeforeComma = length;
     }
 
-    public void setNegative() {
+    public void setNeg() {
         sign = false;
     }
 
-    public void setPositive() {
+    public void setPos() {
         sign = true;
     }
 
@@ -203,38 +197,38 @@ public class CustomNumber {
         sign = singVar;
     }
 
-    public void setValue(String InputString) {
+    public void setValue(String inputString) {
         int lengthTotal;
-        if ((InputString.charAt(0) == '+' || InputString.charAt(0) == '-') && InputString.length() > 1) {
-            if (InputString.charAt(0) == '+') {
+        if ((inputString.charAt(0) == '+' || inputString.charAt(0) == '-') && inputString.length() > 1) {
+            if (inputString.charAt(0) == '+') {
                 sign = true;
             }
-            if (InputString.charAt(0) == '-') {
+            if (inputString.charAt(0) == '-') {
                 sign = false;
             }
-            InputString = InputString.substring(1);
+            inputString = inputString.substring(1);
         } else {
             sign = true;
         }
 
-        InputString = InputString.replaceFirst("^0+(?!$)", "");
-        if (InputString.length() > 0) {
-            while (InputString.endsWith("0")) {
-                InputString = InputString.substring(0, InputString.length() - 1);
+        inputString = inputString.replaceFirst("^0+(?!$)", "");
+        if (inputString.length() > 0) {
+            while (inputString.endsWith("0")) {
+                inputString = inputString.substring(0, inputString.length() - 1);
             }
         }
 
-        if (InputString.equals(".")) {
+        if (inputString.equals(".")) {
             setZero();
         } else {
             eraseDigitArray();
-            lengthBeforeComma = InputString.indexOf(".");
+            lengthBeforeComma = inputString.indexOf(".");
 
-            lengthTotal = InputString.length() - 1;
+            lengthTotal = inputString.length() - 1;
             lengthAfterComma = lengthTotal - lengthBeforeComma;
 
             for (int i = 0; i < lengthBeforeComma; i++) {
-                char k = InputString.charAt(i);
+                char k = inputString.charAt(i);
                 String j = String.valueOf(k);
                 if (j.equals("*")) {
                     digitArray.add((byte) 0);
@@ -245,7 +239,7 @@ public class CustomNumber {
             }
 
             for (int b = lengthBeforeComma + 1; b < lengthTotal + 1; b++) {
-                char k = InputString.charAt(b);
+                char k = inputString.charAt(b);
                 String j = String.valueOf(k);
                 if (j.equals("*")) {
                     digitArray.add((byte) 0);
@@ -253,7 +247,7 @@ public class CustomNumber {
                     digitArray.add((byte) Integer.parseInt(j));
                 }
             }
-            cleanCustomNumber();
+            clean();
         }
     }
 
@@ -268,17 +262,13 @@ public class CustomNumber {
         if (!isZero()) {
             lengthBeforeComma += 1;
             lengthAfterComma -= 1;
-        } else {
-            setZero();
         }
     }
 
-    public void shiftLeft(int Iterations) {
+    public void shiftLeft(int iterations) {
         if (!isZero()) {
-            lengthBeforeComma += Iterations;
-            lengthAfterComma -= Iterations;
-        } else {
-            setZero();
+            lengthBeforeComma += iterations;
+            lengthAfterComma -= iterations;
         }
     }
 
@@ -286,17 +276,61 @@ public class CustomNumber {
         if (!isZero()) {
             lengthBeforeComma -= 1;
             lengthAfterComma += 1;
-        } else {
-            setZero();
         }
     }
 
-    public void shiftRight(int Iterations) {
+    public void shiftRight(int iterations) {
         if (!isZero()) {
-            lengthBeforeComma -= Iterations;
-            lengthAfterComma += Iterations;
-        } else {
-            setZero();
+            lengthBeforeComma -= iterations;
+            lengthAfterComma += iterations;
+        }
+    }
+
+    public void incLBC(int iterations) {
+        if (!isZero()) {
+            lengthBeforeComma += iterations;
+        }
+    }
+
+    public void incLBC() {
+        if (!isZero()) {
+            lengthBeforeComma += 1;
+        }
+    }
+
+    public void incLAC(int iterations) {
+        if (!isZero()) {
+            lengthAfterComma += iterations;
+        }
+    }
+
+    public void incLAC() {
+        if (!isZero()) {
+            lengthAfterComma += 1;
+        }
+    }
+
+    public void decLBC(int iterations) {
+        if (!isZero()) {
+            lengthBeforeComma -= iterations;
+        }
+    }
+
+    public void decLBC() {
+        if (!isZero()) {
+            lengthBeforeComma -= 1;
+        }
+    }
+
+    public void decLAC(int iterations) {
+        if (!isZero()) {
+            lengthAfterComma -= iterations;
+        }
+    }
+
+    public void decLAC() {
+        if (!isZero()) {
+            lengthAfterComma -= 1;
         }
     }
 }

@@ -1,190 +1,184 @@
-import javax.sound.midi.Soundbank;
 import java.util.Objects;
 
 public class CustomNumberUtils {
-    public static void print(CustomNumber NumberToPrint) {
-        //NumberToPrint.cleanCustomNumber();
-
-        System.out.println("Zahl ist Null:          " + NumberToPrint.isZero());
-        System.out.println("Zahl ist Positiv:       " + NumberToPrint.isPositive());
-        if (NumberToPrint.getDigitArray().size() != 0) {
-            System.out.println("Array.get(0) in var:    " + NumberToPrint.getDigitArray().get(0));
+    public static void print(CustomNumber numberToPrint) {
+        System.out.println("Zahl ist Null:          " + numberToPrint.isZero());
+        System.out.println("Zahl ist Positiv:       " + numberToPrint.isPos());
+        if (numberToPrint.getDigitArray().size() != 0) {
+            System.out.println("Array.get(0) in var:    " + numberToPrint.getDigitArray().get(0));
         } else {
             System.out.println("Array.get(0) in var:    IST NULL");
         }
-        System.out.println("Stellen vor dem Komma:  " + NumberToPrint.getlengthBeforeComma());
-        System.out.println("Stellen nach dem Komma: " + NumberToPrint.getlengthAfterComma());
-        System.out.println("Position des Kommas:    nach der " + NumberToPrint.getlengthBeforeComma() + ". Ziffer");
-        System.out.println("Anzahl der Ziffern:     " + NumberToPrint.getDataLengthTotal());
-        System.out.println("Zahl:                   " + NumberToPrint.generateString());
+        System.out.println("Stellen vor dem Komma:  " + numberToPrint.getLBC());
+        System.out.println("Stellen nach dem Komma: " + numberToPrint.getLAC());
+        System.out.println("Position des Kommas:    nach der " + numberToPrint.getLBC() + ". Ziffer");
+        System.out.println("Anzahl der Ziffern:     " + numberToPrint.getDataLength());
+        System.out.println("Zahl:                   " + numberToPrint.generateString());
         System.out.println("-------------------------------------------------------");
     }
 
-    public static CustomNumber addUp(CustomNumber Summand1, CustomNumber Summand2) {
+    public static CustomNumber addUp(CustomNumber summand1, CustomNumber summand2) {
         CustomNumber returnCustomNumber = new CustomNumber();
-        returnCustomNumber = addUpSubstractionLogic(Summand1, Summand2, true);
+        returnCustomNumber = addUpSubstractionLogic(summand1, summand2, true);
         return returnCustomNumber;
     }
 
-    public static CustomNumber subtract(CustomNumber Minuend, CustomNumber Subtrahend) {
+    public static CustomNumber subTr(CustomNumber minuend, CustomNumber subtrahend) {
         CustomNumber returnCustomNumber = new CustomNumber();
-        returnCustomNumber = addUpSubstractionLogic(Minuend, Subtrahend, false);
+        returnCustomNumber = addUpSubstractionLogic(minuend, subtrahend, false);
         return returnCustomNumber;
     }
 
-    public static CustomNumber multiply(CustomNumber Factor1, CustomNumber Factor2) {
+    public static CustomNumber multiply(CustomNumber factor1, CustomNumber factor2) {
         CustomNumber returnCustomNumber = new CustomNumber();
 
-        if (Factor1.isZero() || Factor2.isZero()) {
+        if (factor1.isZero() || factor2.isZero()) {
             returnCustomNumber.setZero();
-        } else if (Factor1.getDataLengthTotal() == 1) {
-            switch (Factor1.getDigitArray().get(0)) {
+        } else if (factor1.getDataLength() == 1) {
+            switch (factor1.getDigitArray().get(0)) {
                 case (byte)1 -> {
-                    returnCustomNumber.is(Factor2);
-                    if (Factor1.getlengthBeforeComma() > 1) {
-                        returnCustomNumber.shiftLeft(Factor1.getlengthBeforeComma() - 1);
-                    } else if (Factor1.getlengthBeforeComma() < 1) {
-                        returnCustomNumber.shiftRight((Factor1.getlengthBeforeComma() * -1) + 1);
+                    returnCustomNumber.set(factor2);
+                    if (factor1.getLBC() > 1) {
+                        returnCustomNumber.shiftLeft(factor1.getLBC() - 1);
+                    } else if (factor1.getLBC() < 1) {
+                        returnCustomNumber.shiftRight((factor1.getLBC() * -1) + 1);
                     }
                 }
                 case (byte)2 -> {
-                    returnCustomNumber = addUp(Factor2, Factor2);
-                    if (Factor1.getlengthBeforeComma() > 1) {
-                        returnCustomNumber.shiftLeft(Factor1.getlengthBeforeComma() - 1);
-                    } else if (Factor1.getlengthBeforeComma() < 1) {
-                        returnCustomNumber.shiftRight((Factor1.getlengthBeforeComma() * -1) + 1);
+                    returnCustomNumber = addUp(factor2, factor2);
+                    if (factor1.getLBC() > 1) {
+                        returnCustomNumber.shiftLeft(factor1.getLBC() - 1);
+                    } else if (factor1.getLBC() < 1) {
+                        returnCustomNumber.shiftRight((factor1.getLBC() * -1) + 1);
                     }
                 }
-                default -> returnCustomNumber = internalMultiplication(Factor2, Factor1);
+                default -> returnCustomNumber = internalMultiplication(factor2, factor1);
             }
-        } else if (Factor2.getDataLengthTotal() == 1) {
-            switch (Factor2.getDigitArray().get(0)) {
+        } else if (factor2.getDataLength() == 1) {
+            switch (factor2.getDigitArray().get(0)) {
                 case (byte)1 -> {
-                    returnCustomNumber.is(Factor1);
-                    if (Factor2.getlengthBeforeComma() > 1) {
-                        returnCustomNumber.shiftLeft(Factor2.getlengthBeforeComma() - 1);
-                    } else if (Factor2.getlengthBeforeComma() < 1) {
-                        returnCustomNumber.shiftRight((Factor2.getlengthBeforeComma() * -1) + 1);
+                    returnCustomNumber.set(factor1);
+                    if (factor2.getLBC() > 1) {
+                        returnCustomNumber.shiftLeft(factor2.getLBC() - 1);
+                    } else if (factor2.getLBC() < 1) {
+                        returnCustomNumber.shiftRight((factor2.getLBC() * -1) + 1);
                     }
                 }
                 case (byte)2 -> {
-                    returnCustomNumber = addUp(Factor1, Factor1);
-                    if (Factor2.getlengthBeforeComma() > 1) {
-                        returnCustomNumber.shiftLeft(Factor2.getlengthBeforeComma() - 1);
-                    } else if (Factor2.getlengthBeforeComma() < 1) {
-                        returnCustomNumber.shiftRight((Factor2.getlengthBeforeComma() * -1) + 1);
+                    returnCustomNumber = addUp(factor1, factor1);
+                    if (factor2.getLBC() > 1) {
+                        returnCustomNumber.shiftLeft(factor2.getLBC() - 1);
+                    } else if (factor2.getLBC() < 1) {
+                        returnCustomNumber.shiftRight((factor2.getLBC() * -1) + 1);
                     }
                 }
-                default -> returnCustomNumber = internalMultiplication(Factor1, Factor2);
+                default -> returnCustomNumber = internalMultiplication(factor1, factor2);
             }
         } else {
-            if (Factor2.getDataLengthTotal() > Factor1.getDataLengthTotal()) {
-                returnCustomNumber = internalMultiplication(Factor2, Factor1);
+            if (factor2.getDataLength() > factor1.getDataLength()) {
+                returnCustomNumber = internalMultiplication(factor2, factor1);
             } else {
-                returnCustomNumber = internalMultiplication(Factor1, Factor2);
+                returnCustomNumber = internalMultiplication(factor1, factor2);
             }
         }
 
-        if (Factor1.isPositive() != Factor2.isPositive()) {
-            returnCustomNumber.setNegative();
+        if (factor1.isPos() != factor2.isPos()) {
+            returnCustomNumber.setNeg();
         }
         else
         {
-            returnCustomNumber.setPositive();
+            returnCustomNumber.setPos();
         }
-
-        //returnCustomNumber.cleanCustomNumber();
-
         return returnCustomNumber;
     }
 
 
-    public static boolean areEqual(CustomNumber Number1, CustomNumber Number2) {
-        if (!((Number1.getlengthBeforeComma() == Number2.getlengthBeforeComma()) && (Number1.getlengthAfterComma() == Number2.getlengthAfterComma()) && (Number1.getDataLengthTotal() == Number2.getDataLengthTotal()))) {
+    public static boolean areEqual(CustomNumber number1, CustomNumber number2) {
+        if (!((number1.getLBC() == number2.getLBC()) && (number1.getLAC() == number2.getLAC()) && (number1.getDataLength() == number2.getDataLength()))) {
             return false;
         }
 
-        if (Number1.isPositive() == Number2.isNegative())
+        if (number1.isPos() == number2.isNeg())
             return false;
 
-        for (int i = 0; i < Number1.getDataLengthTotal(); i++)
-            if (!Objects.equals(Number1.getDigitArray().get(i), Number2.getDigitArray().get(i))) {
+        for (int i = 0; i < number1.getDataLength(); i++)
+            if (!Objects.equals(number1.getDigitArray().get(i), number2.getDigitArray().get(i))) {
                 return false;
             }
 
         return true;
     }
 
-    public static boolean areDigitArraysEqual(CustomNumber Number1, CustomNumber Number2) {
-        if (!(Number1.getDataLengthTotal() == Number2.getDataLengthTotal())) {
+    public static boolean areDigitArraysEqual(CustomNumber number1, CustomNumber number2) {
+        if (!(number1.getDataLength() == number2.getDataLength())) {
             return false;
         }
 
-        for (int i = 0; i < Number1.getDataLengthTotal(); i++)
-            if (!Objects.equals(Number1.getDigitArray().get(i), Number2.getDigitArray().get(i))) {
+        for (int i = 0; i < number1.getDataLength(); i++)
+            if (!Objects.equals(number1.getDigitArray().get(i), number2.getDigitArray().get(i))) {
                 return false;
             }
         return true;
     }
 
-    public static boolean isGreater(CustomNumber Number1, CustomNumber Number2) {
-        boolean retVal = !Number1.isZero() || !Number2.isZero();
-        if (Number1.isZero() && !Number2.isZero()) {
-            retVal = !Number2.isPositive();
+    public static boolean isGreater(CustomNumber number1, CustomNumber number2) {
+        boolean retVal = !number1.isZero() || !number2.isZero();
+        if (number1.isZero() && !number2.isZero()) {
+            retVal = !number2.isPos();
         }
-        if (!Number1.isZero() && Number2.isZero()) {
-            retVal = Number1.isPositive();
+        if (!number1.isZero() && number2.isZero()) {
+            retVal = number1.isPos();
         }
-        if (!Number1.isZero() && !Number2.isZero()) {
-            if (Number1.isPositive() && Number2.isPositive()) {
-                if (Number1.getlengthBeforeComma() < Number2.getlengthBeforeComma()) {
+        if (!number1.isZero() && !number2.isZero()) {
+            if (number1.isPos() && number2.isPos()) {
+                if (number1.getLBC() < number2.getLBC()) {
                     retVal = false;
                 }
-                if (Number1.getlengthBeforeComma() == Number2.getlengthBeforeComma()) {
-                    if (areEqual(Number1, Number2)) {
+                if (number1.getLBC() == number2.getLBC()) {
+                    if (areEqual(number1, number2)) {
                         retVal = false;
                     }
 
-                    Number1.evenOutNumbers(Number2);
-                    Number2.evenOutNumbers(Number1);
+                    number1.evenOut(number2);
+                    number2.evenOut(number1);
 
-                    for (int i = 0; i < Number1.getDigitArray().size(); i++) {
-                        if (Number1.getDigitArray().get(i) > Number2.getDigitArray().get(i)) {
+                    for (int i = 0; i < number1.getDigitArray().size(); i++) {
+                        if (number1.getDigitArray().get(i) > number2.getDigitArray().get(i)) {
                             retVal = true;
                             break;
                         }
-                        if (Number1.getDigitArray().get(i) < Number2.getDigitArray().get(i)) {
+                        if (number1.getDigitArray().get(i) < number2.getDigitArray().get(i)) {
                             retVal = false;
                             break;
                         }
                     }
                 }
             }
-            if (Number1.isPositive() && Number2.isNegative()) {
+            if (number1.isPos() && number2.isNeg()) {
                 retVal = true;
             }
-            if (Number1.isNegative() && Number2.isPositive()) {
+            if (number1.isNeg() && number2.isPos()) {
                 retVal = false;
             }
-            if (Number1.isNegative() && Number2.isNegative()) {
-                if (Number1.getlengthBeforeComma() > Number2.getlengthBeforeComma()) {
+            if (number1.isNeg() && number2.isNeg()) {
+                if (number1.getLBC() > number2.getLBC()) {
                     retVal = false;
                 }
 
-                if (Number1.getlengthBeforeComma() == Number2.getlengthBeforeComma()) {
-                    if (areEqual(Number1, Number2)) {
+                if (number1.getLBC() == number2.getLBC()) {
+                    if (areEqual(number1, number2)) {
                         retVal = false;
                     }
 
-                    Number1.evenOutNumbers(Number2);
-                    Number2.evenOutNumbers(Number1);
+                    number1.evenOut(number2);
+                    number2.evenOut(number1);
 
-                    for (int i = 0; i < Number1.getDigitArray().size(); i++) {
-                        if (Number1.getDigitArray().get(i) > Number2.getDigitArray().get(i)) {
+                    for (int i = 0; i < number1.getDigitArray().size(); i++) {
+                        if (number1.getDigitArray().get(i) > number2.getDigitArray().get(i)) {
                             retVal = false;
                             break;
                         }
-                        if (Number1.getDigitArray().get(i) < Number2.getDigitArray().get(i)) {
+                        if (number1.getDigitArray().get(i) < number2.getDigitArray().get(i)) {
                             retVal = true;
                             break;
                         }
@@ -192,24 +186,24 @@ public class CustomNumberUtils {
                 }
             }
         }
-        Number1.cleanCustomNumber();
-        Number2.cleanCustomNumber();
+        number1.clean();
+        number2.clean();
         return retVal;
     }
 
-    public static boolean isGreaterOrEqual(CustomNumber Number1, CustomNumber Number2) {
-        if (areEqual(Number1, Number2)) {
+    public static boolean isGreaterOrEqual(CustomNumber number1, CustomNumber number2) {
+        if (areEqual(number1, number2)) {
             return true;
         }
-        return isGreater(Number1, Number2);
+        return isGreater(number1, number2);
     }
 
-    public static boolean isSmaller(CustomNumber Number1, CustomNumber Number2) {
-        return !isGreaterOrEqual(Number1, Number2);
+    public static boolean isSmaller(CustomNumber number1, CustomNumber number2) {
+        return !isGreaterOrEqual(number1, number2);
     }
 
-    public static boolean isSmallerOrEqual(CustomNumber Number1, CustomNumber Number2) {
-        return (areEqual(Number1, Number2) || isGreater(Number2, Number1));
+    public static boolean isSmallerOrEqual(CustomNumber number1, CustomNumber number2) {
+        return (areEqual(number1, number2) || isGreater(number2, number1));
     }
 
     /*
@@ -244,72 +238,72 @@ public class CustomNumberUtils {
 (-3) - (-4)	    (+B) - (+A)		        (+4) - (+3)		        1	Subtract(B,A)		    case5
      */
 
-    private static CustomNumber addUpSubstractionLogic(CustomNumber Number1, CustomNumber Number2, boolean Mode) {
+    private static CustomNumber addUpSubstractionLogic(CustomNumber number1, CustomNumber number2, boolean mode) {
         CustomNumber returnCustomNumber = new CustomNumber();
-        boolean number1Positive = Number1.isPositive();
-        boolean number1Negative = Number1.isNegative();
-        boolean number2Positive = Number2.isPositive();
-        boolean number2Negative = Number2.isNegative();
-        Number1.setPositive();
-        Number2.setPositive();
+        boolean number1Positive = number1.isPos();
+        boolean number1Negative = number1.isNeg();
+        boolean number2Positive = number2.isPos();
+        boolean number2Negative = number2.isNeg();
+        number1.setPos();
+        number2.setPos();
 
-        if (areEqual(Number1, Number2)) {
-            if (number1Positive && Mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase1(Number1, Number2);
-            } else if (number1Positive && Mode && number2Negative) {
+        if (areEqual(number1, number2)) {
+            if (number1Positive && mode && number2Positive) {
+                returnCustomNumber = addUpSubtractionLogicCase1(number1, number2);
+            } else if (number1Positive && mode && number2Negative) {
                 returnCustomNumber = addUpSubtractionLogicCase0();
-            } else if (number1Positive && !Mode && number2Positive) {
+            } else if (number1Positive && !mode && number2Positive) {
                 returnCustomNumber = addUpSubtractionLogicCase0();
-            } else if (number1Positive && !Mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase1(Number1, Number2);
-            } else if (number1Negative && Mode && number2Positive) {
+            } else if (number1Positive && !mode && number2Negative) {
+                returnCustomNumber = addUpSubtractionLogicCase1(number1, number2);
+            } else if (number1Negative && mode && number2Positive) {
                 returnCustomNumber = addUpSubtractionLogicCase0();
-            } else if (number1Negative && Mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase2(Number1, Number2);
-            } else if (number1Negative && !Mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase2(Number1, Number2);
-            } else if (number1Negative && !Mode && number2Negative) {
+            } else if (number1Negative && mode && number2Negative) {
+                returnCustomNumber = addUpSubtractionLogicCase2(number1, number2);
+            } else if (number1Negative && !mode && number2Positive) {
+                returnCustomNumber = addUpSubtractionLogicCase2(number1, number2);
+            } else if (number1Negative && !mode && number2Negative) {
                 returnCustomNumber = addUpSubtractionLogicCase0();
             }
-        } else if (isGreater(Number1, Number2)) {
-            if (number1Positive && Mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase1(Number1, Number2);
-            } else if (number1Positive && Mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase3(Number1, Number2);
-            } else if (number1Positive && !Mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase3(Number1, Number2);
-            } else if (number1Positive && !Mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase1(Number1, Number2);
-            } else if (number1Negative && Mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase4(Number1, Number2);
-            } else if (number1Negative && Mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase2(Number1, Number2);
-            } else if (number1Negative && !Mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase2(Number1, Number2);
-            } else if (number1Negative && !Mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase4(Number1, Number2);
+        } else if (isGreater(number1, number2)) {
+            if (number1Positive && mode && number2Positive) {
+                returnCustomNumber = addUpSubtractionLogicCase1(number1, number2);
+            } else if (number1Positive && mode && number2Negative) {
+                returnCustomNumber = addUpSubtractionLogicCase3(number1, number2);
+            } else if (number1Positive && !mode && number2Positive) {
+                returnCustomNumber = addUpSubtractionLogicCase3(number1, number2);
+            } else if (number1Positive && !mode && number2Negative) {
+                returnCustomNumber = addUpSubtractionLogicCase1(number1, number2);
+            } else if (number1Negative && mode && number2Positive) {
+                returnCustomNumber = addUpSubtractionLogicCase4(number1, number2);
+            } else if (number1Negative && mode && number2Negative) {
+                returnCustomNumber = addUpSubtractionLogicCase2(number1, number2);
+            } else if (number1Negative && !mode && number2Positive) {
+                returnCustomNumber = addUpSubtractionLogicCase2(number1, number2);
+            } else if (number1Negative && !mode && number2Negative) {
+                returnCustomNumber = addUpSubtractionLogicCase4(number1, number2);
             }
-        } else if (isSmaller(Number1, Number2)) {
-            if (number1Positive && Mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase1(Number1, Number2);
-            } else if (number1Positive && Mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase6(Number1, Number2);
-            } else if (number1Positive && !Mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase6(Number1, Number2);
-            } else if (number1Positive && !Mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase1(Number1, Number2);
-            } else if (number1Negative && Mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase5(Number1, Number2);
-            } else if (number1Negative && Mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase2(Number1, Number2);
-            } else if (number1Negative && !Mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase2(Number1, Number2);
-            } else if (number1Negative && !Mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase5(Number1, Number2);
+        } else if (isSmaller(number1, number2)) {
+            if (number1Positive && mode && number2Positive) {
+                returnCustomNumber = addUpSubtractionLogicCase1(number1, number2);
+            } else if (number1Positive && mode && number2Negative) {
+                returnCustomNumber = addUpSubtractionLogicCase6(number1, number2);
+            } else if (number1Positive && !mode && number2Positive) {
+                returnCustomNumber = addUpSubtractionLogicCase6(number1, number2);
+            } else if (number1Positive && !mode && number2Negative) {
+                returnCustomNumber = addUpSubtractionLogicCase1(number1, number2);
+            } else if (number1Negative && mode && number2Positive) {
+                returnCustomNumber = addUpSubtractionLogicCase5(number1, number2);
+            } else if (number1Negative && mode && number2Negative) {
+                returnCustomNumber = addUpSubtractionLogicCase2(number1, number2);
+            } else if (number1Negative && !mode && number2Positive) {
+                returnCustomNumber = addUpSubtractionLogicCase2(number1, number2);
+            } else if (number1Negative && !mode && number2Negative) {
+                returnCustomNumber = addUpSubtractionLogicCase5(number1, number2);
             }
         }
-        Number1.setSign(number1Positive);
-        Number2.setSign(number2Positive);
+        number1.setSign(number1Positive);
+        number2.setSign(number2Positive);
 
         return returnCustomNumber;
     }
@@ -320,87 +314,74 @@ public class CustomNumberUtils {
         return returnCustomNumber;
     }
 
-    private static CustomNumber addUpSubtractionLogicCase1(CustomNumber Number1, CustomNumber Number2) {
-        CustomNumber returnCustomNumber = new CustomNumber();
-        returnCustomNumber = internalAddition(Number1, Number2);
+    private static CustomNumber addUpSubtractionLogicCase1(CustomNumber number1, CustomNumber number2) {
+        return internalAddition(number1, number2);
+    }
+
+    private static CustomNumber addUpSubtractionLogicCase2(CustomNumber number1, CustomNumber number2) {
+        CustomNumber returnCustomNumber = internalAddition(number1, number2);
+        returnCustomNumber.setNeg();
         return returnCustomNumber;
     }
 
-    private static CustomNumber addUpSubtractionLogicCase2(CustomNumber Number1, CustomNumber Number2) {
-        CustomNumber returnCustomNumber = new CustomNumber();
-        returnCustomNumber = internalAddition(Number1, Number2);
-        returnCustomNumber.setNegative();
+    private static CustomNumber addUpSubtractionLogicCase3(CustomNumber number1, CustomNumber number2) {
+        return internalSubtraction(number1, number2);
+    }
+
+    private static CustomNumber addUpSubtractionLogicCase4(CustomNumber number1, CustomNumber number2) {
+        CustomNumber returnCustomNumber = internalSubtraction(number1, number2);
+        returnCustomNumber.setNeg();
         return returnCustomNumber;
     }
 
-    private static CustomNumber addUpSubtractionLogicCase3(CustomNumber Number1, CustomNumber Number2) {
-        CustomNumber returnCustomNumber = new CustomNumber();
-        returnCustomNumber = internalSubtraction(Number1, Number2);
-        return returnCustomNumber;
+    private static CustomNumber addUpSubtractionLogicCase5(CustomNumber number1, CustomNumber number2) {
+        return internalSubtraction(number2, number1);
     }
 
-    private static CustomNumber addUpSubtractionLogicCase4(CustomNumber Number1, CustomNumber Number2) {
-        CustomNumber returnCustomNumber = new CustomNumber();
-        returnCustomNumber = internalSubtraction(Number1, Number2);
-        returnCustomNumber.setNegative();
-        return returnCustomNumber;
-    }
-
-    private static CustomNumber addUpSubtractionLogicCase5(CustomNumber Number1, CustomNumber Number2) {
-        CustomNumber returnCustomNumber = new CustomNumber();
-        returnCustomNumber = internalSubtraction(Number2, Number1);
-        return returnCustomNumber;
-    }
-
-    private static CustomNumber addUpSubtractionLogicCase6(CustomNumber Number1, CustomNumber Number2) {
-        CustomNumber returnCustomNumber = new CustomNumber();
-        returnCustomNumber = internalSubtraction(Number2, Number1);
-        returnCustomNumber.setNegative();
+    private static CustomNumber addUpSubtractionLogicCase6(CustomNumber number1, CustomNumber number2) {
+        CustomNumber returnCustomNumber = internalSubtraction(number2, number1);
+        returnCustomNumber.setNeg();
         return returnCustomNumber;
     }
 
     /* Minuend and Subtrahend must be positive
        Minuend must be bigger than the Subtrahend
      */
-    private static CustomNumber internalSubtraction(CustomNumber Minuend, CustomNumber Subtrahend) {
+    private static CustomNumber internalSubtraction(CustomNumber minuend, CustomNumber subtrahend) {
         CustomNumber returnCustomNumber = new CustomNumber();
         byte carry = 0;
 
-        if(!Subtrahend.isZero()) {
-            Minuend.evenOutNumbers(Subtrahend);
-            Subtrahend.evenOutNumbers(Minuend);
+        if(!subtrahend.isZero()) {
+            minuend.evenOut(subtrahend);
+            subtrahend.evenOut(minuend);
             byte tempDigitResult = 0;
-            for (int i = Minuend.getDigitArray().size() - 1; i >= 0; i--) {
-                if ((Subtrahend.getDigitArray().get(i) + carry) <= (Minuend.getDigitArray().get(i))) {
-                    tempDigitResult = (byte) (Minuend.getDigitArray().get(i) - (Subtrahend.getDigitArray().get(i) + carry));
+            for (int i = minuend.getDigitArray().size() - 1; i >= 0; i--) {
+                if ((subtrahend.getDigitArray().get(i) + carry) <= (minuend.getDigitArray().get(i))) {
+                    tempDigitResult = (byte) (minuend.getDigitArray().get(i) - (subtrahend.getDigitArray().get(i) + carry));
                     carry = 0;
-                    //System.out.println("norm:  " + tempDigitResult);
                 }
-                if ((Subtrahend.getDigitArray().get(i) + carry) > (Minuend.getDigitArray().get(i))) {
-                    tempDigitResult = (byte) ((Minuend.getDigitArray().get(i) + (byte) 10) - (Subtrahend.getDigitArray().get(i) + carry));
+                if ((subtrahend.getDigitArray().get(i) + carry) > (minuend.getDigitArray().get(i))) {
+                    tempDigitResult = (byte) ((minuend.getDigitArray().get(i) + (byte) 10) - (subtrahend.getDigitArray().get(i) + carry));
                     carry = 1;
-                    //System.out.println("carry: " + tempDiggitResult);
                 }
 
-                returnCustomNumber.appendDataDigit(tempDigitResult, "l");
-                //System.out.println(Minuend.getDigitArray().get(i));
-
+                returnCustomNumber.appendDigit(tempDigitResult, "l");
             }
 
-            if (Minuend.getlengthAfterComma() > 0) {
-                returnCustomNumber.shiftRight(Minuend.getlengthAfterComma());
+            if (minuend.getLAC() > 0) {
+                returnCustomNumber.shiftRight(minuend.getLAC());
             }
-            if (Minuend.getlengthAfterComma() < 0) {
-                returnCustomNumber.shiftLeft(Minuend.getlengthAfterComma() * -1);
+            if (minuend.getLAC() < 0) {
+                returnCustomNumber.shiftLeft(minuend.getLAC() * -1);
             }
 
-            Minuend.cleanCustomNumber();
-            Subtrahend.cleanCustomNumber();
-            returnCustomNumber.cleanCustomNumber();
+            minuend.clean();
+            subtrahend.clean();
+            returnCustomNumber.clean();
         }
         else
         {
-            returnCustomNumber.is(Minuend);
+            returnCustomNumber.set(minuend);
         }
 
         return returnCustomNumber;
@@ -409,22 +390,22 @@ public class CustomNumberUtils {
     /* Adds up the absolute values of two Summa-nds
         Sign of the returnNumber always positive
      */
-    private static CustomNumber internalAddition(CustomNumber Summand1, CustomNumber Summand2) {
+    private static CustomNumber internalAddition(CustomNumber summand1, CustomNumber summand2) {
         CustomNumber returnCustomNumber = new CustomNumber();
 
-        if (!Summand1.isZero() && !Summand2.isZero()) {
+        if (!summand1.isZero() && !summand2.isZero()) {
             byte carry = 0;
-            if (!(Summand1.getDataLengthTotal() == Summand2.getDataLengthTotal() && Summand1.getlengthBeforeComma() == Summand2.getlengthBeforeComma() && Summand1.getlengthAfterComma() == Summand2.getlengthAfterComma())) {
-                Summand1.evenOutNumbers(Summand2);
-                Summand2.evenOutNumbers(Summand1);
+            if (!(summand1.getDataLength() == summand2.getDataLength() && summand1.getLBC() == summand2.getLBC() && summand1.getLAC() == summand2.getLAC())) {
+                summand1.evenOut(summand2);
+                summand2.evenOut(summand1);
             }
 
-            returnCustomNumber.setLengthBeforeComma(Summand1.getlengthBeforeComma());
-            returnCustomNumber.setLengthAfterComma(Summand1.getlengthAfterComma());
+            returnCustomNumber.setLBC(summand1.getLBC());
+            returnCustomNumber.setLAC(summand1.getLAC());
 
-            for (int i = Summand1.getDataLengthTotal() - 1; i >= 0 || carry != 0; i--) {
+            for (int i = summand1.getDataLength() - 1; i >= 0 || carry != 0; i--) {
                 byte tempDigitResult = 0;
-                tempDigitResult = (byte) (Summand1.getDigitArray().get(i) + Summand2.getDigitArray().get(i) + carry);
+                tempDigitResult = (byte) (summand1.getDigitArray().get(i) + summand2.getDigitArray().get(i) + carry);
                 if (tempDigitResult >= 10) {
                     tempDigitResult = (byte) (tempDigitResult - 10);
                     carry = 1;
@@ -432,74 +413,72 @@ public class CustomNumberUtils {
                     carry = 0;
                 }
 
-                returnCustomNumber.digitArray.add(0, tempDigitResult);
+                returnCustomNumber.getDigitArray().add(0, tempDigitResult);
                 if (i == 0 && carry != 0) {
-                    returnCustomNumber.digitArray.add(0, carry);
-                    returnCustomNumber.lengthBeforeComma += 1;
+                    returnCustomNumber.getDigitArray().add(0, carry);
+                    returnCustomNumber.incLBC();
                     carry = 0;
                 }
             }
         } else {
-            if (Summand2.isZero() && !Summand1.isZero()) {
-                returnCustomNumber.is(Summand1);
+            if (summand2.isZero() && !summand1.isZero()) {
+                returnCustomNumber.set(summand1);
             }
-            if (Summand1.isZero() && !Summand2.isZero()) {
-                returnCustomNumber.is(Summand2);
+            if (summand1.isZero() && !summand2.isZero()) {
+                returnCustomNumber.set(summand2);
             }
-            if (Summand1.isZero() && Summand2.isZero()) {
+            if (summand1.isZero() && summand2.isZero()) {
                 returnCustomNumber.setZero();
             }
         }
-        Summand1.cleanCustomNumber();
-        Summand2.cleanCustomNumber();
-        returnCustomNumber.cleanCustomNumber();
+        summand1.clean();
+        summand2.clean();
+        returnCustomNumber.clean();
         return returnCustomNumber;
     }
 
     /* multiplies 2 Numbers; always returns a positive result */
-    private static CustomNumber internalMultiplication(CustomNumber Factor1, CustomNumber Factor2) {
+    private static CustomNumber internalMultiplication(CustomNumber factor1, CustomNumber factor2) {
         CustomNumber returnCustomNumber = new CustomNumber();
-
         CustomNumber tempFactor1 = new CustomNumber();
         CustomNumber tempFactor2 = new CustomNumber();
-
         CustomNumber lineResult = new CustomNumber();
 
         int digitsCountToShiftRight = 0;
         returnCustomNumber.setZero();
 
-        if (Factor1.getlengthAfterComma() > 0) {
-            digitsCountToShiftRight = digitsCountToShiftRight + Factor1.getlengthAfterComma();
+        if (factor1.getLAC() > 0) {
+            digitsCountToShiftRight = digitsCountToShiftRight + factor1.getLAC();
         }
 
-        if (Factor2.getlengthAfterComma() > 0) {
-            digitsCountToShiftRight = digitsCountToShiftRight + Factor2.getlengthAfterComma();
+        if (factor2.getLAC() > 0) {
+            digitsCountToShiftRight = digitsCountToShiftRight + factor2.getLAC();
         }
 
-        tempFactor1.is(Factor1);
-        tempFactor2.is(Factor2);
+        tempFactor1.set(factor1);
+        tempFactor2.set(factor2);
 
-        if (tempFactor1.getlengthAfterComma() > 0) {
-            tempFactor1.setLengthBeforeComma(tempFactor1.getlengthBeforeComma() + tempFactor1.getlengthAfterComma());
-            tempFactor1.setLengthAfterComma(0);
+        if (tempFactor1.getLAC() > 0) {
+            tempFactor1.setLBC(tempFactor1.getLBC() + tempFactor1.getLAC());
+            tempFactor1.setLAC(0);
         }
-        if (tempFactor2.getlengthAfterComma() > 0) {
-            tempFactor2.setLengthBeforeComma(tempFactor2.getlengthBeforeComma() + tempFactor2.getlengthAfterComma());
-            tempFactor2.setLengthAfterComma(0);
+        if (tempFactor2.getLAC() > 0) {
+            tempFactor2.setLBC(tempFactor2.getLBC() + tempFactor2.getLAC());
+            tempFactor2.setLAC(0);
         }
 
-        for (int i = 0; i < tempFactor2.getDataLengthTotal(); i++) {
+        for (int i = 0; i < tempFactor2.getDataLength(); i++) {
             switch (tempFactor2.getDigitArray().get(i)) {
                 case 0 -> lineResult.setZero();
-                case 1 -> lineResult.is(tempFactor1);
+                case 1 -> lineResult.set(tempFactor1);
                 case 2 -> lineResult = internalAddition(tempFactor1, tempFactor1);
                 default -> {
-                    lineResult = oneDiggitCustomNumberMultiplication(tempFactor1, tempFactor2.getDigitArray().get(i));
-                    lineResult.cleanCustomNumber();
+                    lineResult = oneDigitCustomNumberMultiplication(tempFactor1, tempFactor2.getDigitArray().get(i));
+                    lineResult.clean();
                 }
             }
 
-            lineResult.shiftLeft(tempFactor2.getlengthBeforeComma() - i - 1);
+            lineResult.shiftLeft(tempFactor2.getLBC() - i - 1);
             returnCustomNumber = internalAddition(lineResult, returnCustomNumber);
         }
         if (digitsCountToShiftRight > 0) {
@@ -522,29 +501,29 @@ public class CustomNumberUtils {
         Rückgabewerte sind immer ganze Zahlen ohne Nachkommastellen.
     */
 
-    private static CustomNumber oneDiggitCustomNumberMultiplication(CustomNumber Factor, byte DigitFactor) {
+    private static CustomNumber oneDigitCustomNumberMultiplication(CustomNumber factor, byte digitFactor) {
         CustomNumber returnCustomNumber = new CustomNumber();
-        if (Factor.isZero() || DigitFactor == 0) {
+        if (factor.isZero() || digitFactor == 0) {
             returnCustomNumber.setZero();
         } else {
 
-            while (Factor.getDigitArray().size() < Factor.getlengthBeforeComma()) {
-                Factor.getDigitArray().add(Factor.getDigitArray().size(), (byte) 0);
-                Factor.lengthAfterComma += 1;
+            while (factor.getDigitArray().size() < factor.getLBC()) {
+                factor.getDigitArray().add(factor.getDigitArray().size(), (byte) 0);
+                factor.setLAC(factor.getLAC()+1);
             }
 
             byte carry = 0;
-            for (int i = Factor.getDataLengthTotal() - 1; i >= 0 || carry != 0; i--) {
+            for (int i = factor.getDataLength() - 1; i >= 0 || carry != 0; i--) {
                 byte tempDigitResult = 0;
                 byte digitResult = 0;
-                tempDigitResult = (byte) (Factor.getDigitArray().get(i) * DigitFactor + carry);
+                tempDigitResult = (byte) (factor.getDigitArray().get(i) * digitFactor + carry);
                 digitResult = (byte) ((tempDigitResult) % 10);
                 carry = (byte) (tempDigitResult / 10);
 
-                returnCustomNumber.appendDataDigit(digitResult, "L");
+                returnCustomNumber.appendDigit(digitResult, "L");
                 if (i == 0 && carry != 0) {
-                    returnCustomNumber.digitArray.add(0, carry);
-                    returnCustomNumber.lengthBeforeComma += 1;
+                    returnCustomNumber.getDigitArray().add(0, carry);
+                    returnCustomNumber.incLBC();
                     carry = 0;
                 }
             }
@@ -552,18 +531,17 @@ public class CustomNumberUtils {
         return returnCustomNumber;
     }
 
-    public static void test(int Iterations) {
+    public static void test(int iterations) {
         CustomNumber ctValA = new CustomNumber();
         CustomNumber ctValB = new CustomNumber();
         double dbValA;
         double dbValB;
 
-
-        for(double i = Iterations * -1; i <= Iterations;i+=1)
+        for(double i = iterations * -1; i <= iterations;i+=1)
         {
-            for(double k = Iterations * -1; k <= Iterations; k+= 1)
+            for(double k = iterations * -1; k <= iterations; k+= 1)
             {
-                for(double j = Iterations * -1; j <= Iterations; j+= 1)
+                for(double j = iterations * -1; j <= iterations; j+= 1)
                 {
                     dbValA = j + i;
                     dbValB = k - i;
@@ -582,46 +560,46 @@ public class CustomNumberUtils {
         System.out.println("No Error in occurred while testing!");
     }
 
-    private static boolean testCase(CustomNumber CtValA, CustomNumber CtValB, double DbValA, double DbValB) {
+    private static boolean testCase(CustomNumber ctValA, CustomNumber ctValB, double dbValA, double dbValB) {
         CustomNumber ctValRes = new CustomNumber();
         CustomNumber ctDbTempRes = new CustomNumber();
         double dbValRes;
 
-        ctValRes = addUp(CtValA, CtValB);
-        dbValRes = DbValA + DbValB;
+        ctValRes = addUp(ctValA, ctValB);
+        dbValRes = dbValA + dbValB;
 
         ctDbTempRes.setValue(String.valueOf(dbValRes));
         if (!ctValRes.generateString().equals(ctDbTempRes.generateString())) {
-            testCaseErrorMessage(ctValRes, ctDbTempRes, dbValRes, CtValA, CtValB, DbValA, DbValB);
+            testCaseErrorMessage(ctValRes, ctDbTempRes, dbValRes, ctValA, ctValB, dbValA, dbValB);
             return false;
         }
 
-        ctValRes = subtract(CtValA, CtValB);
-        dbValRes = DbValA - DbValB;
+        ctValRes = subTr(ctValA, ctValB);
+        dbValRes = dbValA - dbValB;
 
         ctDbTempRes.setValue(String.valueOf(dbValRes));
         if (!ctValRes.generateString().equals(ctDbTempRes.generateString())) {
-            testCaseErrorMessage(ctValRes, ctDbTempRes, dbValRes, CtValA, CtValB, DbValA, DbValB);
+            testCaseErrorMessage(ctValRes, ctDbTempRes, dbValRes, ctValA, ctValB, dbValA, dbValB);
             return false;
         }
 
-        ctValRes = multiply(CtValA, CtValB);
-        dbValRes = DbValA * DbValB;
+        ctValRes = multiply(ctValA, ctValB);
+        dbValRes = dbValA * dbValB;
 
         ctDbTempRes.setValue(String.valueOf(dbValRes));
         if (!ctValRes.generateString().equals(ctDbTempRes.generateString())) {
-            testCaseErrorMessage(ctValRes, ctDbTempRes, dbValRes, CtValA, CtValB, DbValA, DbValB);
+            testCaseErrorMessage(ctValRes, ctDbTempRes, dbValRes, ctValA, ctValB, dbValA, dbValB);
             return false;
         }
 
         CustomNumber tmpCtValA = new CustomNumber();
         CustomNumber tmpCtValB = new CustomNumber();
 
-        double tmpDbValA = DbValA * 10;
-        double tmpDbValB = DbValB * 10;
+        double tmpDbValA = dbValA * 10;
+        double tmpDbValB = dbValB * 10;
 
-        tmpCtValA.is(CtValA);
-        tmpCtValB.is(CtValB);
+        tmpCtValA.set(ctValA);
+        tmpCtValB.set(ctValB);
 
         tmpCtValA.shiftLeft();
         tmpCtValB.shiftLeft();
@@ -637,22 +615,22 @@ public class CustomNumberUtils {
         return true;
     }
 
-    private static void testCaseErrorMessage(CustomNumber CtValRes, CustomNumber CtDbTempRes, double DbValRes, CustomNumber CtValA, CustomNumber CtValB, double DbValA, double DbValB) {
+    private static void testCaseErrorMessage(CustomNumber ctValRes, CustomNumber ctDbTempRes, double dbValRes, CustomNumber ctValA, CustomNumber ctValB, double dbValA, double dbValB) {
         System.out.println("========================= ERROR =========================");
         System.out.println("Compared Strings:");
-        System.out.println("ct:    " + CtValRes.generateString());
-        System.out.println("ctTmp: " + CtDbTempRes.generateString());
-        System.out.println("db:    " + String.valueOf(DbValRes));
+        System.out.println("ct:    " + ctValRes.generateString());
+        System.out.println("ctTmp: " + ctDbTempRes.generateString());
+        System.out.println("db:    " + String.valueOf(dbValRes));
         System.out.println("Custom Number Calculated Value: ");
-        print(CtValRes);
+        print(ctValRes);
         System.out.println("Double Calculated Value: ");
-        print(CtDbTempRes);
+        print(ctDbTempRes);
         System.out.println("Custom Number Input: ");
-        print(CtValA);
-        print(CtValB);
+        print(ctValA);
+        print(ctValB);
         System.out.println("Double Input:");
-        System.out.println(DbValA);
-        System.out.println(DbValB);
+        System.out.println(dbValA);
+        System.out.println(dbValB);
         System.out.println("======================= ERROR END =======================");
     }
 }
