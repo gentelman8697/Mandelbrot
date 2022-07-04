@@ -97,11 +97,11 @@ public class CustomNumberUtils {
             return false;
         }
 
-        for (int i = 0; i < number1.getDataLength(); i++)
+        for (int i = 0; i < number1.getDataLength(); i++) {
             if (!Objects.equals(number1.getDigitArray().get(i), number2.getDigitArray().get(i))) {
                 return false;
             }
-
+        }
         return true;
     }
 
@@ -508,8 +508,8 @@ public class CustomNumberUtils {
 
             byte carry = 0;
             for (int i = factor.getDataLength() - 1; i >= 0 || carry != 0; i--) {
-                byte tempDigitResult = 0;
-                byte digitResult = 0;
+                byte tempDigitResult;
+                byte digitResult;
                 tempDigitResult = (byte) (factor.getDigitArray().get(i) * digitFactor + carry);
                 digitResult = (byte) ((tempDigitResult) % 10);
                 carry = (byte) (tempDigitResult / 10);
@@ -525,20 +525,47 @@ public class CustomNumberUtils {
         return retCustomNumber;
     }
 
+    private static void internalDivisionAfterComma(CustomNumber dividend, CustomNumber divisor, CustomNumber retCustomNumber) {
+        byte addVal = 0;
+        int count = 0;
+        while (count < dividend.getDataLength() + divisor.getDataLength() + 5) {
+            while (isGreaterOrEqual(dividend, divisor)) {
+                dividend = subTr(dividend, divisor);
+                addVal++;
+            }
+            retCustomNumber.appendDigit(addVal, "R");
+            if (dividend.isZero()) {
+                break;
+            }
+            dividend.appendDigit((byte) 0, "R");
+            dividend.shiftLeft();
+            addVal = 0;
+            count++;
+        }
+    }
+
     public static CustomNumber divide(CustomNumber dividend, CustomNumber divisor) {
         CustomNumber retCustomNumber = new CustomNumber();
+        boolean dividendPos = dividend.isPos();
+        boolean divisorPos = divisor.isPos();
 
-        print(dividend);
-        print(divisor);
-
-
+        dividend.setPos();
+        divisor.setPos();
         if (divisor.isZero()) {
+            dividend.setSign(dividendPos);
+            divisor.setSign(divisorPos);
+            retCustomNumber.setSign(divisorPos == dividendPos);
             throw new RuntimeException("STOP YOU VIOLATED THE LAW !");
         } else if (dividend.isZero()) {
+            dividend.setSign(dividendPos);
+            divisor.setSign(divisorPos);
             retCustomNumber.setZero();
             return retCustomNumber;
         } else if (areEqual(dividend, divisor)) {
+            dividend.setSign(dividendPos);
+            divisor.setSign(divisorPos);
             retCustomNumber.setValue("+1.");
+            retCustomNumber.setSign(divisorPos == dividendPos);
             return retCustomNumber;
         } else if (isSmaller(dividend, divisor)) {
             CustomNumber workDividend = new CustomNumber();
@@ -555,25 +582,12 @@ public class CustomNumberUtils {
                 workDividend.appendDigit((byte) 0, "R");
             }
 
-            byte addVal = 0;
-            int count = 0;
-
-            while (count < 100) {
-                while (isGreaterOrEqual(workDividend, workDivisor)) {
-                    workDividend = subTr(workDividend, workDivisor);
-                    addVal++;
-                }
-                retCustomNumber.appendDigit(addVal, "R");
-                if (workDividend.isZero()) {
-                    break;
-                }
-                workDividend.appendDigit((byte) 0, "R");
-                workDividend.shiftLeft();
-                addVal = 0;
-                count++;
-
-            }
+            internalDivisionAfterComma(workDividend, workDivisor, retCustomNumber);
             retCustomNumber.shiftLeft();
+            retCustomNumber.clean();
+            retCustomNumber.setSign(divisorPos == dividendPos);
+            dividend.setSign(dividendPos);
+            divisor.setSign(divisorPos);
         } else {
             CustomNumber workDividend = new CustomNumber();
             CustomNumber workDivisor = new CustomNumber();
@@ -584,38 +598,35 @@ public class CustomNumberUtils {
             workDivisor.shiftLeft(maxAfter);
             workDividend.setPhantomZeros();
             workDivisor.setPhantomZeros();
-
-            int diff = dividend.getDataLength() - divisor.getDataLength();
-
             CustomNumber tempDividend = new CustomNumber();
             tempDividend.set(workDividend);
 
-            for (int i = 0; i < diff; i++) {
+            int newDiff = dividend.getLBC() - divisor.getLBC();
+            for (int i = 0; i < newDiff; i++) {
                 tempDividend.removeDataDigit("R");
             }
-
-            tempDividend.shiftRight(diff);
+            tempDividend.shiftRight(newDiff);
 
             byte addVal = 0;
-            int count = 0;
-
-            //TODO hier
-
-            for(int i = 0; i <= diff; i++)
-            {
-                while(isGreaterOrEqual(tempDividend,workDivisor))
-                {
-                    tempDividend = subTr(tempDividend,workDivisor);
+            for (int i = 0; i < newDiff; i++) {
+                while (isGreaterOrEqual(tempDividend, workDivisor)) {
+                    tempDividend = subTr(tempDividend, workDivisor);
                     addVal++;
                 }
-                retCustomNumber.appendDigit(addVal,"R");
-                tempDividend.appendDigit(workDividend.getDigitArray().get(workDividend.getDataLength()-diff),"R");
+                retCustomNumber.appendDigit(addVal, "R");
+                addVal = 0;
+                tempDividend.appendDigit(workDividend.getDigitArray().get(workDividend.getDataLength() - (newDiff - i)), "R");
                 tempDividend.shiftLeft();
             }
+            internalDivisionAfterComma(tempDividend, workDivisor, retCustomNumber);
+            retCustomNumber.shiftLeft(newDiff + 1);
+            retCustomNumber.clean();
+            retCustomNumber.setSign(divisorPos == dividendPos);
+            dividend.setSign(dividendPos);
+            divisor.setSign(divisorPos);
         }
         return retCustomNumber;
     }
-
 
     public static void test(int iterations) {
         CustomNumber ctValA = new CustomNumber();

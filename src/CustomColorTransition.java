@@ -60,11 +60,10 @@ public class CustomColorTransition {
 
 	public int calculateCustomColorTransitionSubPosition(int value) {
 		int divisor = 1;
-		double tempVal = value;
 		double temp2 = (double) maxValue / ((double) getTransitionSize() - 1);
 		double temp = temp2;
 
-		for (; temp < tempVal;) {
+		for (; temp < (double) value;) {
 			divisor++;
 			temp = temp2;
 			temp = temp * divisor;
@@ -99,5 +98,4 @@ public class CustomColorTransition {
 			System.out.println(i + ": " + colorArray.get(i));
 	
 	}
-
 }

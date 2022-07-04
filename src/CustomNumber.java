@@ -335,7 +335,7 @@ public class CustomNumber {
     }
 
     public void setPhantomZeros() {
-        if (isZero()) {
+        if (!isZero()) {
             while (lengthAfterComma < 0) {
                 digitArray.add(digitArray.size(), (byte) 0);
                 lengthAfterComma += 1;
