@@ -63,6 +63,4 @@ public class CustomColor {
 		return "CustomColor [colorValue=" + colorValue + ", alpha=" + alpha + ", red=" + red + ", green=" + green
 				+ ", blue=" + blue + "]";
 	}
-
-	
 }

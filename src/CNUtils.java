@@ -1,23 +1,6 @@
 import java.util.Objects;
 
-public class CustomNumberUtils {
-    public static void print(CustomNumber numberToPrint) {
-        System.out.println("Zahl ist Null:          " + numberToPrint.isZero());
-        System.out.println("Zahl ist Positiv:       " + numberToPrint.isPos());
-        if (numberToPrint.getDigitArray().size() != 0) {
-            System.out.println("Array.get(0) in var:    " + numberToPrint.getDigitArray().get(0));
-        } else {
-            System.out.println("Array.get(0) in var:    IST NULL");
-        }
-        System.out.println("Stellen vor dem Komma:  " + numberToPrint.getLBC());
-        System.out.println("Stellen nach dem Komma: " + numberToPrint.getLAC());
-        System.out.println("Position des Kommas:    nach der " + numberToPrint.getLBC() + ". Ziffer");
-        System.out.println("Anzahl der Ziffern:     " + numberToPrint.getDataLength());
-
-        System.out.println("Zahl:                   " + numberToPrint.toString());
-        System.out.println("-------------------------------------------------------");
-    }
-
+public class CNUtils {
     public static CustomNumber addUp(CustomNumber summand1, CustomNumber summand2) {
         CustomNumber returnCustomNumber = new CustomNumber();
         returnCustomNumber = addUpSubstractionLogic(summand1, summand2, true);
@@ -96,26 +79,9 @@ public class CustomNumberUtils {
         if (!((number1.isPos() == number2.isPos()) && (number1.getLBC() == number2.getLBC()) && (number1.getLAC() == number2.getLAC()) && (number1.getDataLength() == number2.getDataLength()))) {
             return false;
         }
-
-        for (int i = 0; i < number1.getDataLength(); i++) {
-            if (!Objects.equals(number1.getDigitArray().get(i), number2.getDigitArray().get(i))) {
-                return false;
-            }
-        }
-        return true;
+        return number1.getDigitArray().equals(number2.getDigitArray());
     }
 
-    public static boolean areDigitArraysEqual(CustomNumber number1, CustomNumber number2) {
-        if (!(number1.getDataLength() == number2.getDataLength())) {
-            return false;
-        }
-
-        for (int i = 0; i < number1.getDataLength(); i++)
-            if (!Objects.equals(number1.getDigitArray().get(i), number2.getDigitArray().get(i))) {
-                return false;
-            }
-        return true;
-    }
 
     public static boolean isGreater(CustomNumber number1, CustomNumber number2) {
         boolean retVal = !number1.isZero() || !number2.isZero();
@@ -708,6 +674,62 @@ public class CustomNumberUtils {
         return true;
     }
 
+    public static CustomNumber squareRoot(CustomNumber number, int relevant) {
+        CustomNumber workNumber1 = new CustomNumber();
+        CustomNumber workNumber2 = new CustomNumber(number);
+        CustomNumber temp = new CustomNumber();
+
+        for (int i = 0; i < 10; i++) {
+            workNumber1 = CNUtils.divide(CNUtils.addUp(workNumber1, workNumber2), new CustomNumber("+2."));
+            workNumber2 = CNUtils.divide(number, workNumber1);
+            if (workNumber1.getDataLength() > relevant) {
+                workNumber1.removeNDataDigitsRight(workNumber1.getDataLength()-relevant);
+            }
+            if (workNumber2.getDataLength() > relevant) {
+                workNumber2.removeNDataDigitsRight(workNumber2.getDataLength()-relevant);
+            }
+            if (areEqual(temp, workNumber2)) {
+                System.out.println("hi!");
+                break;
+            }
+            temp.set(workNumber2);
+        }
+        return workNumber2;
+    }
+
+    public static CustomNumber exp(CustomNumber number, int exp) {
+        CustomNumber retNumber = new CustomNumber();
+
+        if (exp == 0) {
+            retNumber.set(new CustomNumber("+1."));
+        } else if (exp > 0) {
+            if (exp == 1) {
+                retNumber.set(number);
+            } else {
+                retNumber.set(number);
+                for (int i = 0; i < exp - 1; i++) {
+                    retNumber = CNUtils.multiply(number, retNumber);
+                }
+            }
+        } else {
+            retNumber.set(number);
+            if (exp != -1) {
+                exp *= -1;
+                for (int i = 0; i < exp - 1; i++) {
+                    retNumber = CNUtils.multiply(number, retNumber);
+                }
+            }
+            retNumber = CNUtils.divide(new CustomNumber("+1."), retNumber);
+        }
+
+        if(number.isNeg() && exp % 2 != 0)
+        {
+            retNumber.setNeg();
+        }
+
+        return retNumber;
+    }
+
     private static void testCaseErrorMessage(CustomNumber ctValRes, CustomNumber ctDbTempRes, double dbValRes, CustomNumber ctValA, CustomNumber ctValB, double dbValA, double dbValB) {
         System.out.println("========================= ERROR =========================");
         System.out.println("Compared Strings:");
@@ -715,12 +737,12 @@ public class CustomNumberUtils {
         System.out.println("ctTmp: " + ctDbTempRes.toString());
         System.out.println("db:    " + String.valueOf(dbValRes));
         System.out.println("Custom Number Calculated Value: ");
-        print(ctValRes);
+        ctValRes.print();
         System.out.println("Double Calculated Value: ");
-        print(ctDbTempRes);
+        ctDbTempRes.print();
         System.out.println("Custom Number Input: ");
-        print(ctValA);
-        print(ctValB);
+        ctValA.print();
+        ctValB.print();
         System.out.println("Double Input:");
         System.out.println(dbValA);
         System.out.println(dbValB);

@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CustomNumber {
     private int lengthBeforeComma;
@@ -15,6 +16,13 @@ public class CustomNumber {
 
     public CustomNumber(String InputString) {
         setValue(InputString);
+    }
+
+    public CustomNumber(CustomNumber number) {
+        this.lengthBeforeComma = number.lengthBeforeComma;
+        this.lengthAfterComma = number.lengthAfterComma;
+        this.sign = number.sign;
+        this.digitArray = new ArrayList<>(number.digitArray);
     }
 
     public void appendDigit(byte digit, String position) {
@@ -56,10 +64,6 @@ public class CustomNumber {
         }
     }
 
-    private void eraseDigitArray() {
-        digitArray = new ArrayList<>();
-    }
-
     public void evenOut(CustomNumber evenOutNumber) {
         while (evenOutNumber.lengthBeforeComma > lengthBeforeComma) {
             digitArray.add(0, (byte) 0);
@@ -71,6 +75,7 @@ public class CustomNumber {
             lengthAfterComma = lengthAfterComma + 1;
         }
     }
+
     @Override
     public String toString() {
         StringBuilder returnString = new StringBuilder();
@@ -177,6 +182,34 @@ public class CustomNumber {
         }
     }
 
+    public void removeNDataDigitsLeft(int n) {
+        if (!isZero() && n < this.digitArray.size()) {
+            if (n > 0) {
+                digitArray.subList(0, n).clear();
+                lengthBeforeComma -= n;
+            }
+        } else if (this.digitArray.size() == n) {
+            this.lengthAfterComma = 0;
+            this.lengthBeforeComma = 0;
+            this.sign = true;
+            this.digitArray = new ArrayList<>();
+        }
+    }
+
+    public void removeNDataDigitsRight(int n) {
+        if (!isZero() && n < this.digitArray.size()) {
+            if (n > 0) {
+                digitArray.subList(digitArray.size() - n, digitArray.size()).clear();
+            }
+            lengthAfterComma -= n;
+        } else if (this.digitArray.size() == n) {
+            this.lengthAfterComma = 0;
+            this.lengthBeforeComma = 0;
+            this.sign = true;
+            this.digitArray = new ArrayList<>();
+        }
+    }
+
     public void setLAC(int length) {
         lengthAfterComma = length;
     }
@@ -221,7 +254,7 @@ public class CustomNumber {
         if (inputString.equals(".")) {
             setZero();
         } else {
-            eraseDigitArray();
+            digitArray = new ArrayList<>();
             lengthBeforeComma = inputString.indexOf(".");
 
             lengthTotal = inputString.length() - 1;
@@ -255,7 +288,7 @@ public class CustomNumber {
         sign = true;
         lengthAfterComma = 0;
         lengthBeforeComma = 0;
-        eraseDigitArray();
+        digitArray = new ArrayList<>();
     }
 
     public void shiftLeft() {
@@ -341,5 +374,29 @@ public class CustomNumber {
                 lengthAfterComma += 1;
             }
         }
+    }
+
+    public boolean areDigitArraysEqual(CustomNumber number1) {
+        if (!(number1.getDataLength() == this.getDataLength())) {
+            return false;
+        }
+
+        return Objects.equals(number1.getDigitArray(), this.getDigitArray());
+    }
+
+    public void print() {
+        System.out.println("Zahl ist Null:          " + this.isZero());
+        System.out.println("Zahl ist Positiv:       " + this.isPos());
+        if (this.getDigitArray().size() != 0) {
+            System.out.println("Array.get(0) in var:    " + this.getDigitArray().get(0));
+        } else {
+            System.out.println("Array.get(0) in var:    IST NULL");
+        }
+        System.out.println("Stellen vor dem Komma:  " + this.getLBC());
+        System.out.println("Stellen nach dem Komma: " + this.getLAC());
+        System.out.println("Position des Kommas:    nach der " + this.getLBC() + ". Ziffer");
+        System.out.println("Anzahl der Ziffern:     " + this.getDataLength());
+        System.out.println("Zahl:                   " + this);
+        System.out.println("-------------------------------------------------------");
     }
 }

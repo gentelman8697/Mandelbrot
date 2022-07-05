@@ -181,11 +181,27 @@ public class Window {
         CustomNumber n6 = new CustomNumber();
         CustomNumber n7 = new CustomNumber();
 
-        n1.setValue("-1.");
-        n2.setValue("+10.1");
+        n1.setValue("+1.");
+        n2.setValue("+2.");
+        n3.setValue("+3.");
+        n4.setValue("+4.");
 
-        n3 = CustomNumberUtils.divide(n1,n2);
+        CustomComplexNumber c1 = new CustomComplexNumber(new CustomNumber(), new CustomNumber());
+        CustomComplexNumber c2 = new CustomComplexNumber(new CustomNumber("+.25"), new CustomNumber("+.25"));
 
-            CustomNumberUtils.print(n3);
+        for(int i = 0; i < 100; i++)
+        {
+            c1 = CCNUtils.multiply(c1,c1);
+            c1 = CCNUtils.addUp(c1,c2);
+            if(CNUtils.isGreater(CCNUtils.absolute(c1),new CustomNumber("+2.")))
+            {
+                System.out.println("yes");
+            }
+            else {
+                System.out.println("no");
+            }
+            System.out.println(c1);
+            System.out.println(CCNUtils.absolute(c1));
+        }
     }
 }
