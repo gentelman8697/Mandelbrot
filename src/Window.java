@@ -89,30 +89,31 @@ public class Window {
 
     private void updateScreen(JLabel lblNewLabel, BufferedImage img, PixelArray testArray) {
 
-        testArray.reSize(frame.getWidth() - 12, frame.getHeight() - 35);
+
+        testArray.reSize(240,240);
+
+        //testArray.reSize(frame.getWidth() - 12, frame.getHeight() - 35);
         // -26 und -71 für ein genaues Einpassen ins JFrame
 
-        int width = testArray.getArrayWidth();
-        int height = testArray.getArrayLength();
 
-        img = resizeImage(img, testArray.getArrayWidth(), testArray.getArrayLength());
+        img = resizeImage(img, testArray.getArrLenX(), testArray.getArrLenY());
 
         System.out.println("Frame W: " + frame.getWidth());
         System.out.println("Frame H: " + frame.getHeight());
-        System.out.println("Array W: " + testArray.getArrayWidth());
-        System.out.println("Array H: " + testArray.getArrayLength());
+        System.out.println("Array W: " + testArray.getArrLenX());
+        System.out.println("Array H: " + testArray.getArrLenY());
         System.out.println("img   W: " + img.getWidth());
         System.out.println("img   H: " + img.getHeight());
 
-	/*
+
 		CustomColor testColor2 = new CustomColor((int) (Math.random()*255),255,0,0);
 		CustomColor testColor3 = new CustomColor((int) (Math.random()*255),(int) 0,255,0);
-		CustomColor testColor4 = new CustomColor((int) (Math.random()*255),(int) 0,0,255); */
-
+		CustomColor testColor4 = new CustomColor((int) (Math.random()*255),(int) 0,0,255);
+/*
         CustomColor testColor2 = new CustomColor((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255));
         CustomColor testColor3 = new CustomColor((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255));
         CustomColor testColor4 = new CustomColor((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255));
-		/*CustomColor testColor5 = new CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
+		CustomColor testColor5 = new CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
 		CustomColor testColor6 = new CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
 		CustomColor testColor7 = new CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
 		CustomColor testColor8 = new CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
@@ -136,42 +137,8 @@ public class Window {
 		/*
 		testTransition1.addTransitionColor(testColor5);
 		testTransition1.addTransitionColor(testColor6);
-		testTransition1.addTransitionColor(testColor7);
-		testTransition1.addTransitionColor(testColor8);
-		testTransition1.addTransitionColor(testColor9);
-		testTransition1.addTransitionColor(testColor10);
-		testTransition1.addTransitionColor(testColor11);
-		testTransition1.addTransitionColor(testColor12);
-		testTransition1.addTransitionColor(testColor13);
-		testTransition1.addTransitionColor(testColor14);
-		testTransition1.addTransitionColor(testColor15);
-		testTransition1.addTransitionColor(testColor16);
-		testTransition1.addTransitionColor(testColor17); */
+		testTransition1.addTransitionColor(testColor7); */
 
-
-        testTransition1.setMaxValue(testArray.getMaxValue());
-
-        //System.out.println(testTransition1.toString());
-
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                int temp;
-
-                temp = testArray.getDataArray().get(x).get(y);
-                outPutColor = testTransition1.returnCustomColorTransitionColor(temp);
-                img.setRGB(x, y, outPutColor.getColorValue());
-            }
-        }
-
-        frame.getContentPane().add(lblNewLabel);
-
-        lblNewLabel.setIcon(new ImageIcon(img));
-		/*
-		System.out.println();
-		System.out.println(img.getRGB(0, 0));
-		System.out.println(img.getRGB(testArray.getArrayWidth() - 10, testArray.getArrayLength() - 10)); */
-
-        // ===============================================================================================================
 
         CustomNumber n1 = new CustomNumber();
         CustomNumber n2 = new CustomNumber();
@@ -187,21 +154,86 @@ public class Window {
         n4.setValue("+4.");
 
         CustomComplexNumber c1 = new CustomComplexNumber(new CustomNumber(), new CustomNumber());
-        CustomComplexNumber c2 = new CustomComplexNumber(new CustomNumber("+.25"), new CustomNumber("+.25"));
+        CustomComplexNumber c2 = new CustomComplexNumber(new CustomNumber("+.45"), new CustomNumber("+.45"));
 
-        for(int i = 0; i < 100; i++)
-        {
-            c1 = CCNUtils.multiply(c1,c1);
-            c1 = CCNUtils.addUp(c1,c2);
-            if(CNUtils.isGreater(CCNUtils.absolute(c1),new CustomNumber("+2.")))
-            {
-                System.out.println("yes");
+        int[][] mandelArr = new int[240][240];
+
+        for (int i = 0; i < mandelArr.length; i++) {
+            for (int j = 0; j < mandelArr[0].length; j++) {
+                mandelArr[i][j] = 0;
             }
-            else {
-                System.out.println("no");
-            }
-            System.out.println(c1);
-            System.out.println(CCNUtils.absolute(c1));
         }
+
+        int iVal = 0;
+        int jVal = 0;
+
+        int accur = 3;
+        int iters = 25;
+
+
+        for (CustomNumber i = new CustomNumber("-.75"); CNUtils.isSmaller(i, new CustomNumber("+.75")); i = CNUtils.addUp(i, new CustomNumber("+.00625"))) {
+            System.out.println(i);
+            for (CustomNumber j = new CustomNumber("-.75"); CNUtils.isSmaller(j, new CustomNumber("+.75")); j = CNUtils.addUp(j, new CustomNumber("+.00625"))) {
+                System.out.print("+");
+                int safeVal = 0;
+                c1 = new CustomComplexNumber(new CustomNumber(), new CustomNumber());
+                if (!j.isZero() && !i.isZero()) {
+                    for (int k = 0; k < iters; k++) {
+                        c1 = CCNUtils.multiply(c1, c1, accur);
+                        c1 = CCNUtils.addUp(c1, new CustomComplexNumber(i, j), accur);
+                        safeVal = k;
+                        if (CNUtils.isGreater(CCNUtils.absolute(c1, accur), new CustomNumber("+2."))) {
+                            break;
+                        }
+                    }
+                }
+                mandelArr[iVal][jVal] = safeVal;
+                jVal++;
+            }
+            iVal++;
+            jVal = 0;
+        }
+
+
+        for (int i = 0; i < mandelArr.length; i++) {
+            for (int j = 0; j < mandelArr[0].length; j++) {
+                String printString = " ";
+                if (mandelArr[i][j] < 100) {
+                    printString += " ";
+                }
+                if (mandelArr[i][j] < 10) printString += " ";
+                {
+                    printString += mandelArr[i][j];
+                    System.out.print(printString);
+                }
+            }
+            System.out.println();
+        }
+
+        testArray.set(mandelArr);
+        testTransition1.setMaxValue(testArray.getMaxValue());
+
+        //for (int x = 0; x < width; x++) {
+        //    for (int y = 0; y < height; y++) {
+
+        for (int x = 0; x < testArray.getArrLenX(); x++) {
+            for (int y = 0; y < testArray.getArrLenY(); y++) {
+                int temp;
+                temp = testArray.getDataArray()[x][y];
+                outPutColor = testTransition1.returnCustomColorTransitionColor(temp);
+                img.setRGB(x, y, outPutColor.getColorValue());
+            }
+        }
+
+        frame.getContentPane().add(lblNewLabel);
+        lblNewLabel.setIcon(new ImageIcon(img));
+		/*
+		System.out.println();
+		System.out.println(img.getRGB(0, 0));
+		System.out.println(img.getRGB(testArray.getArrayWidth() - 10, testArray.getArrayLength() - 10)); */
+
+        // ===============================================================================================================
+
+
     }
 }

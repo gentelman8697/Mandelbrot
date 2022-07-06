@@ -183,11 +183,9 @@ public class CustomNumber {
     }
 
     public void removeNDataDigitsLeft(int n) {
-        if (!isZero() && n < this.digitArray.size()) {
-            if (n > 0) {
-                digitArray.subList(0, n).clear();
-                lengthBeforeComma -= n;
-            }
+        if (!isZero() && n > 0 && n < this.digitArray.size()) {
+            digitArray.subList(0, n).clear();
+            lengthBeforeComma -= n;
         } else if (this.digitArray.size() == n) {
             this.lengthAfterComma = 0;
             this.lengthBeforeComma = 0;
@@ -196,11 +194,13 @@ public class CustomNumber {
         }
     }
 
+    public void cropRelevant(int relevant) {
+        this.removeNDataDigitsRight(this.digitArray.size() - relevant);
+    }
+
     public void removeNDataDigitsRight(int n) {
-        if (!isZero() && n < this.digitArray.size()) {
-            if (n > 0) {
-                digitArray.subList(digitArray.size() - n, digitArray.size()).clear();
-            }
+        if (!isZero() && n > 0 && n < this.digitArray.size()) {
+            digitArray.subList(digitArray.size() - n, digitArray.size()).clear();
             lengthAfterComma -= n;
         } else if (this.digitArray.size() == n) {
             this.lengthAfterComma = 0;

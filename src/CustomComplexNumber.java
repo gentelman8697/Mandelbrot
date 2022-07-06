@@ -8,6 +8,12 @@ public class CustomComplexNumber {
         this.imag = new CustomNumber(imag);
     }
 
+    public CustomComplexNumber(CustomComplexNumber number)
+    {
+        this.real = number.real;
+        this.imag = number.imag;
+    }
+
     public CustomComplexNumber()
     {
         this.real = new CustomNumber();
