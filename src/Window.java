@@ -98,7 +98,7 @@ public class Window {
     private void updateScreen(JLabel lblNewLabel, BufferedImage img, PixelArray testArray) {
 
 
-        testArray.reSize(240,240);
+        testArray.reSize(120,120);
 
         //testArray.reSize(frame.getWidth() - 12, frame.getHeight() - 35);
         // -26 und -71 für ein genaues Einpassen ins JFrame
@@ -168,7 +168,7 @@ public class Window {
         CustomComplexNumber c1 = new CustomComplexNumber(new CustomNumber(), new CustomNumber());
         CustomComplexNumber c2 = new CustomComplexNumber(new CustomNumber("+.45"), new CustomNumber("+.45"));
 
-        int[][] mandelArr = new int[240][240];
+        int[][] mandelArr = new int[120][120];
 
         for (int i = 0; i < mandelArr.length; i++) {
             for (int j = 0; j < mandelArr[0].length; j++) {
@@ -180,12 +180,12 @@ public class Window {
         int jVal = 0;
 
         int accur = 6;
-        int iters = 500;
+        int iters = 200;
 
 
-        for (CustomNumber i = new CustomNumber("-2."); CNUtils.isSmaller(i, new CustomNumber("+1.")); i = CNUtils.addUp(i, new CustomNumber("+.0125"))) {
+        for (CustomNumber i = new CustomNumber("-2."); CNUtils.isSmaller(i, new CustomNumber("+1.")); i = CNUtils.addUp(i, new CustomNumber("+.025"))) {
             System.out.println(i);
-            for (CustomNumber j = new CustomNumber("-1.5"); CNUtils.isSmaller(j, new CustomNumber("+1.5")); j = CNUtils.addUp(j, new CustomNumber("+.0125"))) {
+            for (CustomNumber j = new CustomNumber("-1.5"); CNUtils.isSmaller(j, new CustomNumber("+1.5")); j = CNUtils.addUp(j, new CustomNumber("+.025"))) {
                 System.out.print("+");
                 int safeVal = 0;
                 c1 = new CustomComplexNumber(new CustomNumber(), new CustomNumber());
@@ -245,7 +245,5 @@ public class Window {
 		System.out.println(img.getRGB(testArray.getArrayWidth() - 10, testArray.getArrayLength() - 10)); */
 
         // ===============================================================================================================
-
-
     }
 }

@@ -103,7 +103,7 @@ public class CNUtils {
             retCustomNumber.setSign(divisorPos == dividendPos);
             dividend.print();
             divisor.print();
-            throw new RuntimeException("STOP YOU VIOLATED THE LAW !");
+            throw new RuntimeException("STOP YOU VIOLATED THE LAW ! (div by zero)");
         } else if (dividend.isZero()) {
             dividend.setSign(dividendPos);
             divisor.setSign(divisorPos);
@@ -125,7 +125,7 @@ public class CNUtils {
             workDivisor.setPhantomZeros();
 
             while (isGreater(workDividend, workDivisor)) {
-                workDividend.appendDigit((byte) 0, "R");
+                workDividend.appendDigitRight((byte) 0);
             }
 
             internalDivisionAfterComma(workDividend, workDivisor, retCustomNumber);
@@ -149,7 +149,7 @@ public class CNUtils {
 
             int newDiff = dividend.getLBC() - divisor.getLBC();
             for (int i = 0; i < newDiff; i++) {
-                tempDividend.removeDataDigit("R");
+                tempDividend.removeDigitRight();
             }
             tempDividend.shiftRight(newDiff);
 
@@ -159,9 +159,9 @@ public class CNUtils {
                     tempDividend = subTr(tempDividend, workDivisor, -1);
                     addVal++;
                 }
-                retCustomNumber.appendDigit(addVal, "R");
+                retCustomNumber.appendDigitRight(addVal);
                 addVal = 0;
-                tempDividend.appendDigit(workDividend.getDigitArray().get(workDividend.getDataLength() - (newDiff - i)), "R");
+                tempDividend.appendDigitRight(workDividend.getDigitArray().get(workDividend.getDataLength() - (newDiff - i)));
                 tempDividend.shiftLeft();
             }
             internalDivisionAfterComma(tempDividend, workDivisor, retCustomNumber);
@@ -189,10 +189,10 @@ public class CNUtils {
             workNumber2 = CNUtils.divide(number, workNumber1, -1);
 
             if (workNumber1.getDataLength() > relevant) {
-                workNumber1.removeNDataDigitsRight(workNumber1.getDataLength()-relevant);
+                workNumber1.removeNDigitsRight(workNumber1.getDataLength()-relevant);
             }
             if (workNumber2.getDataLength() > relevant) {
-                workNumber2.removeNDataDigitsRight(workNumber2.getDataLength()-relevant);
+                workNumber2.removeNDigitsRight(workNumber2.getDataLength()-relevant);
             }
 
             if (areEqual(temp, workNumber2)) {
@@ -499,7 +499,7 @@ public class CNUtils {
                     carry = 1;
                 }
 
-                returnCustomNumber.appendDigit(tempDigitResult, "l");
+                returnCustomNumber.appendDigitLeft(tempDigitResult);
             }
 
             if (minuend.getLAC() > 0) {
@@ -590,6 +590,8 @@ public class CNUtils {
         tempFactor1.set(factor1);
         tempFactor2.set(factor2);
 
+
+
         if (tempFactor1.getLAC() > 0) {
             tempFactor1.setLBC(tempFactor1.getLBC() + tempFactor1.getLAC());
             tempFactor1.setLAC(0);
@@ -610,7 +612,10 @@ public class CNUtils {
                 }
             }
 
-            lineResult.shiftLeft(tempFactor2.getLBC() - i - 1);
+            if(!lineResult.isZero()) //FIXME: this if should not be needed, rework multiplication
+            {
+                lineResult.shiftLeft(tempFactor2.getLBC() - i - 1);
+            }
             returnCustomNumber = internalAddition(lineResult, returnCustomNumber);
         }
         if (digitsCountToShiftRight > 0) {
@@ -652,7 +657,7 @@ public class CNUtils {
                 digitResult = (byte) ((tempDigitResult) % 10);
                 carry = (byte) (tempDigitResult / 10);
 
-                retCustomNumber.appendDigit(digitResult, "L");
+                retCustomNumber.appendDigitLeft(digitResult);
                 if (i == 0 && carry != 0) {
                     retCustomNumber.getDigitArray().add(0, carry);
                     retCustomNumber.incLBC();
@@ -671,11 +676,11 @@ public class CNUtils {
                 dividend = subTr(dividend, divisor, -1);
                 addVal++;
             }
-            retCustomNumber.appendDigit(addVal, "R");
+            retCustomNumber.appendDigitRight(addVal);
             if (dividend.isZero()) {
                 break;
             }
-            dividend.appendDigit((byte) 0, "R");
+            dividend.appendDigitRight((byte) 0);
             dividend.shiftLeft();
             addVal = 0;
             count++;

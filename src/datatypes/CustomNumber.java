@@ -1,5 +1,7 @@
 package datatypes;
 
+import org.junit.jupiter.api.function.Executable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -27,16 +29,14 @@ public class CustomNumber {
         this.digitArray = new ArrayList<>(number.digitArray);
     }
 
-    public void appendDigit(byte digit, String position) {
-        String charAt = position.substring(0, 1);
-        if (charAt.equals("L") || charAt.equals("l") || charAt.equals("B") || charAt.equals("b")) {
-            digitArray.add(0, digit);
-            lengthBeforeComma = lengthBeforeComma + 1;
-        }
-        if (charAt.equals("R") || charAt.equals("r") || charAt.equals("A") || charAt.equals("a")) {
-            digitArray.add(digitArray.size(), digit);
-            lengthAfterComma = lengthAfterComma + 1;
-        }
+    public void appendDigitLeft(byte digit) {
+        digitArray.add(0, digit);
+        lengthBeforeComma = lengthBeforeComma + 1;
+    }
+
+    public void appendDigitRight(byte digit) {
+        digitArray.add(digitArray.size(), digit);
+        lengthAfterComma = lengthAfterComma + 1;
     }
 
     public void clean() {
@@ -61,8 +61,12 @@ public class CustomNumber {
                 }
             }
             lengthAfterComma = lengthAfterComma - reduceAfter;
-        } else {
-            setZero();
+
+            if(lengthBeforeComma == lengthAfterComma * -1)
+            {
+                lengthBeforeComma = 0;
+                lengthAfterComma = 0;
+            }
         }
     }
 
@@ -131,16 +135,17 @@ public class CustomNumber {
         return lengthBeforeComma;
     }
 
-    public void invertSign() {
+    public Executable invertSign() {
         if (!isZero()) {
             sign = !sign;
         } else {
-            sign = true;
+            throw new RuntimeException("invertSign but number is Zero!");
         }
+        return null;
     }
 
     public void set(CustomNumber number) {
-        sign = number.isPos();
+        sign = number.sign;
         lengthBeforeComma = number.lengthBeforeComma;
         lengthAfterComma = number.lengthAfterComma;
         digitArray = new ArrayList<>(number.digitArray);
@@ -155,7 +160,28 @@ public class CustomNumber {
     }
 
     public boolean isZero() {
-        return ((lengthBeforeComma + lengthAfterComma) == 0 || digitArray.size() == 0);
+        /* This if is never triggered(cant prove, found out by testing), and so the second if with reval is not needed.
+        I assume handling LBC and LAC regarding the handling of zeroes is consistent:
+        That means: If a number is Zero, both ways of finding out if a number is zero are both true.
+
+        if(digitArray.size() == 0 && (lengthBeforeComma != 0 || lengthAfterComma != 0))
+            throw new RuntimeException("oh no :(");
+
+        boolean retVal = (lengthBeforeComma == lengthAfterComma * -1 || digitArray.size() == 0);
+        if (retVal) {
+            lengthAfterComma = 0;
+            lengthBeforeComma = 0;
+        }*/
+
+
+        //This is also not needed because the code seems to be consistent!
+        if((lengthBeforeComma == lengthAfterComma && lengthBeforeComma == 0) && digitArray.size() == 0)
+            return true;
+        if(lengthBeforeComma != lengthAfterComma*-1  && digitArray.size() != 0)
+            return false;
+        throw new RuntimeException("oh no :(");
+
+        //return (lengthBeforeComma == lengthAfterComma*-1 || digitArray.size() == 0);
     }
 
     public void printDigitArray() {
@@ -168,23 +194,25 @@ public class CustomNumber {
         System.out.println("DigitArrayString: " + retString);
     }
 
-    public void removeDataDigit(String pos) {
+    public void removeDigitLeft() {
         if (!isZero()) {
-            String charAt = pos.substring(0, 1);
-            if (charAt.equals("L") || charAt.equals("l") || charAt.equals("B") || charAt.equals("b")) {
-                digitArray.remove(0);
-                lengthBeforeComma -= 1;
-
-            }
-            if (charAt.equals("R") || charAt.equals("r") || charAt.equals("A") || charAt.equals("a")) {
-
-                digitArray.remove(getDataLength() - 1);
-                lengthAfterComma -= 1;
-            }
+            digitArray.remove(0);
+            lengthBeforeComma -= 1;
+        } else {
+            throw new RuntimeException("removeDataDigitLeft but number is Zero!");
         }
     }
 
-    public void removeNDataDigitsLeft(int n) {
+    public void removeDigitRight() {
+        if (!isZero()) {
+            digitArray.remove(getDataLength() - 1);
+            lengthAfterComma -= 1;
+        } else {
+            throw new RuntimeException("removeDataDigitRight but number is Zero!");
+        }
+    }
+
+    public void removeNDigitsLeft(int n) {
         if (!isZero() && n > 0 && n < this.digitArray.size()) {
             digitArray.subList(0, n).clear();
             lengthBeforeComma -= n;
@@ -196,11 +224,7 @@ public class CustomNumber {
         }
     }
 
-    public void cropRelevant(int relevant) {
-        this.removeNDataDigitsRight(this.digitArray.size() - relevant);
-    }
-
-    public void removeNDataDigitsRight(int n) {
+    public void removeNDigitsRight(int n) {
         if (!isZero() && n > 0 && n < this.digitArray.size()) {
             digitArray.subList(digitArray.size() - n, digitArray.size()).clear();
             lengthAfterComma -= n;
@@ -211,6 +235,11 @@ public class CustomNumber {
             this.digitArray = new ArrayList<>();
         }
     }
+
+    public void cropRelevant(int relevant) {
+        this.removeNDigitsRight(this.digitArray.size() - relevant);
+    }
+
 
     public void setLAC(int length) {
         lengthAfterComma = length;
@@ -297,6 +326,8 @@ public class CustomNumber {
         if (!isZero()) {
             lengthBeforeComma += 1;
             lengthAfterComma -= 1;
+        } else {
+            throw new RuntimeException("shiftLeft but number is Zero!");
         }
     }
 
@@ -304,6 +335,8 @@ public class CustomNumber {
         if (!isZero()) {
             lengthBeforeComma += iterations;
             lengthAfterComma -= iterations;
+        } else {
+            throw new RuntimeException("shiftLeft but number is Zero!");
         }
     }
 
@@ -311,6 +344,8 @@ public class CustomNumber {
         if (!isZero()) {
             lengthBeforeComma -= 1;
             lengthAfterComma += 1;
+        } else {
+            throw new RuntimeException("shiftRight but number is Zero!");
         }
     }
 
@@ -318,54 +353,72 @@ public class CustomNumber {
         if (!isZero()) {
             lengthBeforeComma -= iterations;
             lengthAfterComma += iterations;
+        } else {
+            throw new RuntimeException("shiftRight but number is Zero!");
         }
     }
 
     public void incLBC(int iterations) {
         if (!isZero()) {
             lengthBeforeComma += iterations;
+        } else {
+            throw new RuntimeException("incLBC but number is Zero!");
         }
     }
 
     public void incLBC() {
         if (!isZero()) {
             lengthBeforeComma += 1;
+        } else {
+            throw new RuntimeException("incLBC but number is Zero!");
         }
     }
 
     public void incLAC(int iterations) {
         if (!isZero()) {
             lengthAfterComma += iterations;
+        } else {
+            throw new RuntimeException("incLAC but number is Zero!");
         }
     }
 
     public void incLAC() {
         if (!isZero()) {
             lengthAfterComma += 1;
+        } else {
+            throw new RuntimeException("incLAC but number is Zero!");
         }
     }
 
     public void decLBC(int iterations) {
         if (!isZero()) {
             lengthBeforeComma -= iterations;
+        } else {
+            throw new RuntimeException("decLBC but number is Zero!");
         }
     }
 
     public void decLBC() {
         if (!isZero()) {
             lengthBeforeComma -= 1;
+        } else {
+            throw new RuntimeException("decLBC but number is Zero!");
         }
     }
 
     public void decLAC(int iterations) {
         if (!isZero()) {
             lengthAfterComma -= iterations;
+        } else {
+            throw new RuntimeException("decLAC but number is Zero!");
         }
     }
 
     public void decLAC() {
         if (!isZero()) {
             lengthAfterComma -= 1;
+        } else {
+            throw new RuntimeException("decLAC but number is Zero!");
         }
     }
 
@@ -375,6 +428,8 @@ public class CustomNumber {
                 digitArray.add(digitArray.size(), (byte) 0);
                 lengthAfterComma += 1;
             }
+        } else {
+            throw new RuntimeException("setPhantomZeros but number is Zero!");
         }
     }
 
