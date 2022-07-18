@@ -19,7 +19,7 @@ public class CustomNumber {
     }
 
     public CustomNumber(String InputString) {
-        setValue(InputString);
+        set(InputString);
     }
 
     public CustomNumber(CustomNumber number) {
@@ -261,7 +261,7 @@ public class CustomNumber {
         sign = singVar;
     }
 
-    public void setValue(String inputString) {
+    public void set(String inputString) {
         int lengthTotal;
         if ((inputString.charAt(0) == '+' || inputString.charAt(0) == '-') && inputString.length() > 1) {
             if (inputString.charAt(0) == '+') {

@@ -111,7 +111,7 @@ public class CNUtils {
         } else if (areEqual(dividend, divisor)) {
             dividend.setSign(dividendPos);
             divisor.setSign(divisorPos);
-            retCustomNumber.setValue("+1.");
+            retCustomNumber.set("+1.");
             retCustomNumber.setSign(divisorPos == dividendPos);
         } else if (isSmaller(dividend, divisor)) {
             CustomNumber workDividend = new CustomNumber();
@@ -698,8 +698,8 @@ public class CNUtils {
                 for (double j = iterations * -1; j <= iterations; j += 1) {
                     dbValA = j + i;
                     dbValB = k - i;
-                    ctValA.setValue(String.valueOf(dbValA));
-                    ctValB.setValue(String.valueOf(dbValB));
+                    ctValA.set(String.valueOf(dbValA));
+                    ctValB.set(String.valueOf(dbValB));
                     if (!testCase(ctValA, ctValB, dbValA, dbValB)) {
                         System.out.println(i);
                         System.out.println(k);
@@ -720,7 +720,7 @@ public class CNUtils {
         ctValRes = addUp(ctValA, ctValB, -1);
         dbValRes = dbValA + dbValB;
 
-        ctDbTempRes.setValue(String.valueOf(dbValRes));
+        ctDbTempRes.set(String.valueOf(dbValRes));
         if (!ctValRes.toString().equals(ctDbTempRes.toString())) {
             testCaseErrorMessage(ctValRes, ctDbTempRes, dbValRes, ctValA, ctValB, dbValA, dbValB);
             return false;
@@ -729,7 +729,7 @@ public class CNUtils {
         ctValRes = subTr(ctValA, ctValB, -1);
         dbValRes = dbValA - dbValB;
 
-        ctDbTempRes.setValue(String.valueOf(dbValRes));
+        ctDbTempRes.set(String.valueOf(dbValRes));
         if (!ctValRes.toString().equals(ctDbTempRes.toString())) {
             testCaseErrorMessage(ctValRes, ctDbTempRes, dbValRes, ctValA, ctValB, dbValA, dbValB);
             return false;
@@ -738,7 +738,7 @@ public class CNUtils {
         ctValRes = multiply(ctValA, ctValB, -1);
         dbValRes = dbValA * dbValB;
 
-        ctDbTempRes.setValue(String.valueOf(dbValRes));
+        ctDbTempRes.set(String.valueOf(dbValRes));
         if (!ctValRes.toString().equals(ctDbTempRes.toString())) {
             testCaseErrorMessage(ctValRes, ctDbTempRes, dbValRes, ctValA, ctValB, dbValA, dbValB);
             return false;
@@ -759,7 +759,7 @@ public class CNUtils {
         ctValRes = multiply(tmpCtValA, tmpCtValB, -1);
         dbValRes = tmpDbValA * tmpDbValB;
 
-        ctDbTempRes.setValue(String.valueOf(dbValRes));
+        ctDbTempRes.set(String.valueOf(dbValRes));
         if (!ctValRes.toString().equals(ctDbTempRes.toString())) {
             testCaseErrorMessage(ctValRes, ctDbTempRes, dbValRes, tmpCtValA, tmpCtValB, tmpDbValA, tmpDbValB);
             return false;

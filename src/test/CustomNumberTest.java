@@ -126,22 +126,29 @@ class CustomNumberTest {
 
         CustomNumber n3 = new CustomNumber();
 
-        RuntimeException thrown = assertThrows(RuntimeException.class, () -> {
-            n3.invertSign();
-        });
+        RuntimeException thrown = assertThrows(RuntimeException.class, n3::invertSign);
         assertEquals("invertSign but number is Zero!",thrown.getMessage());
     }
 
     @Test
     void set() {
-    }
-
-    @Test
-    void isNeg() {
-    }
-
-    @Test
-    void isPos() {
+        CustomNumber n1 = new CustomNumber("+00000123.40000000");
+        assertTrue(n1.isPos());
+        assertEquals(3,n1.getLBC());
+        assertEquals(1,n1.getLAC());
+        CustomNumber n2 = new CustomNumber();
+        assertTrue(n2.isPos());
+        n2.appendDigitLeft((byte) 3);
+        n2.appendDigitLeft((byte) 2);
+        n2.appendDigitLeft((byte) 1);
+        n2.appendDigitRight((byte) 4);
+        assertTrue(CNUtils.areEqual(n1,n2));
+        CustomNumber n3 = new CustomNumber("-.000001");
+        assertEquals(-5,n3.getLBC());
+        assertTrue(n3.isNeg());
+        assertFalse(CNUtils.areEqual(n1,n3));
+        n3.set(n2);
+        assertTrue(CNUtils.areEqual(n1,n3));
     }
 
     @Test

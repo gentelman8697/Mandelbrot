@@ -160,10 +160,10 @@ public class Window {
         CustomNumber n6 = new CustomNumber();
         CustomNumber n7 = new CustomNumber();
 
-        n1.setValue("+1.");
-        n2.setValue("+2.");
-        n3.setValue("+3.");
-        n4.setValue("+4.");
+        n1.set("+1.");
+        n2.set("+2.");
+        n3.set("+3.");
+        n4.set("+4.");
 
         CustomComplexNumber c1 = new CustomComplexNumber(new CustomNumber(), new CustomNumber());
         CustomComplexNumber c2 = new CustomComplexNumber(new CustomNumber("+.45"), new CustomNumber("+.45"));
