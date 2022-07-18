@@ -194,7 +194,7 @@ public class Window {
                         c1 = CCNUtils.multiply(c1, c1, accur);
                         c1 = CCNUtils.addUp(c1, new CustomComplexNumber(i, j), accur);
                         safeVal = k;
-                        if (CNUtils.isGreater(CCNUtils.absolute(c1, accur), new CustomNumber("+2."))) {
+                        if (CNUtils.isGreater(CCNUtils.absolute(c1, accur/2), new CustomNumber("+2."))) {
                             break;
                         }
                     }

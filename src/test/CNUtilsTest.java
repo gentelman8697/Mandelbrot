@@ -7,73 +7,56 @@ class CNUtilsTest {
 
     @Test
     void addUp() {
-    }
-
-    @Test
-    void testAddUp() {
-    }
-
-    @Test
-    void subTr() {
-    }
-
-    @Test
-    void testSubTr() {
-    }
-
-    @Test
-    void multiply() {
-    }
-
-    @Test
-    void testMultiply() {
-    }
-
-    @Test
-    void divide() {
-    }
-
-    @Test
-    void testDivide() {
-    }
-
-    @Test
-    void squareRoot() {
-    }
-
-    @Test
-    void testSquareRoot() {
-    }
-
-    @Test
-    void exp() {
-    }
-
-    @Test
-    void testExp() {
+        //TODO
     }
 
     @Test
     void areEqual() {
+        //TODO
+    }
+
+    @Test
+    void divide() {
+        //TODO
+    }
+
+    @Test
+    void exp() {
+        //TODO
     }
 
     @Test
     void isGreater() {
+        //TODO
     }
 
     @Test
     void isGreaterOrEqual() {
+        //TODO
     }
 
     @Test
     void isSmaller() {
+        //TODO
     }
 
     @Test
     void isSmallerOrEqual() {
+        //TODO
     }
 
     @Test
-    void test1() {
+    void multiply() {
+        //TODO
+    }
+
+    @Test
+    void squareRoot() {
+        //TODO
+    }
+
+    @Test
+    void subTr() {
+        //TODO
     }
 }

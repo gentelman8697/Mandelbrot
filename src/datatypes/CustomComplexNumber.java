@@ -4,22 +4,30 @@ public class CustomComplexNumber {
     private CustomNumber real;
     private CustomNumber imag;
 
-    public CustomComplexNumber(CustomNumber real, CustomNumber imag)
-    {
+    public CustomComplexNumber(CustomNumber real, CustomNumber imag) {
         this.real = new CustomNumber(real);
         this.imag = new CustomNumber(imag);
     }
 
-    public CustomComplexNumber(CustomComplexNumber number)
-    {
+    public CustomComplexNumber(CustomComplexNumber number) {
         this.real = number.real;
         this.imag = number.imag;
     }
 
-    public CustomComplexNumber()
-    {
+    public CustomComplexNumber() {
         this.real = new CustomNumber();
         this.imag = new CustomNumber();
+    }
+
+    public void set(CustomComplexNumber number) {
+        this.setReal(number.real);
+        this.setImag(number.imag);
+    }
+
+    @Override
+    public String toString() {
+        return "R: " + real +
+                " I: " + imag;
     }
 
     public CustomNumber getImag() {
@@ -36,17 +44,5 @@ public class CustomComplexNumber {
 
     public void setReal(CustomNumber real) {
         this.real.set(real);
-    }
-
-    public void set(CustomComplexNumber number)
-    {
-        this.setReal(number.real);
-        this.setImag(number.imag);
-    }
-
-    @Override
-    public String toString() {
-        return  "R: " + real +
-                " I: " + imag;
     }
 }

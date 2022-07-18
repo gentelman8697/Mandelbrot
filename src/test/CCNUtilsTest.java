@@ -4,44 +4,28 @@ import static org.junit.jupiter.api.Assertions.*;
 import datatypes.*;
 
 class CCNUtilsTest {
+    @Test
+    void absolute() {
+        //TODO
+    }
 
     @Test
     void addUp() {
-    }
-
-    @Test
-    void testAddUp() {
-    }
-
-    @Test
-    void subTr() {
-    }
-
-    @Test
-    void testSubTr() {
-    }
-
-    @Test
-    void multiply() {
-    }
-
-    @Test
-    void testMultiply() {
+        //TODO
     }
 
     @Test
     void divide() {
+        //TODO
     }
 
     @Test
-    void testDivide() {
+    void multiply() {
+        //TODO
     }
 
     @Test
-    void absolute() {
-    }
-
-    @Test
-    void testAbsolute() {
+    void subTr() {
+        //TODO
     }
 }

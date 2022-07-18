@@ -4,7 +4,6 @@ import org.junit.jupiter.api.function.Executable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class CustomNumber {
     private int lengthBeforeComma;
@@ -70,6 +69,10 @@ public class CustomNumber {
         }
     }
 
+    public void cropRelevant(int relevant) {
+        this.removeNDigitsRight(this.digitArray.size() - relevant);
+    }
+
     public void evenOut(CustomNumber evenOutNumber) {
         while (evenOutNumber.lengthBeforeComma > lengthBeforeComma) {
             digitArray.add(0, (byte) 0);
@@ -82,57 +85,8 @@ public class CustomNumber {
         }
     }
 
-    @Override
-    public String toString() {
-        StringBuilder returnString = new StringBuilder();
-
-        for (int i = 0; i < getDataLength(); i++) {
-            byte k = digitArray.get(i);
-            String j = String.valueOf(k);
-            returnString.append(j);
-        }
-
-        if (lengthBeforeComma < 0 || lengthAfterComma < 0) {
-
-            if (lengthAfterComma < 0) {
-                returnString.append("*".repeat(Math.max(0, (lengthAfterComma * -1))));
-                returnString.append(".");
-            }
-
-            if (lengthBeforeComma < 0) {
-                for (int i = 0; i < (lengthBeforeComma * -1); i++) {
-                    returnString.insert(0, "*");
-                }
-                returnString.insert(0, ".");
-            }
-        } else {
-            String b = returnString.substring(0, lengthBeforeComma);
-            String c = returnString.substring(lengthBeforeComma, getDataLength());
-            returnString = new StringBuilder(b + "." + c);
-        }
-
-        if (isPos() || isZero()) {
-            returnString.insert(0, "+");
-        } else {
-            returnString.insert(0, "-");
-        }
-        return returnString.toString();
-    }
-
     public int getDataLength() {
         return lengthBeforeComma + lengthAfterComma;
-    }
-
-    public List<Byte> getDigitArray() {
-        return digitArray;
-    }
-
-    public int getLAC() {
-        return lengthAfterComma;
-    }
-
-    public int getLBC() {
-        return lengthBeforeComma;
     }
 
     public Executable invertSign() {
@@ -142,13 +96,6 @@ public class CustomNumber {
             throw new RuntimeException("invertSign but number is Zero!");
         }
         return null;
-    }
-
-    public void set(CustomNumber number) {
-        sign = number.sign;
-        lengthBeforeComma = number.lengthBeforeComma;
-        lengthAfterComma = number.lengthAfterComma;
-        digitArray = new ArrayList<>(number.digitArray);
     }
 
     public boolean isNeg() {
@@ -182,16 +129,6 @@ public class CustomNumber {
         throw new RuntimeException("oh no :(");
 
         //return (lengthBeforeComma == lengthAfterComma*-1 || digitArray.size() == 0);
-    }
-
-    public void printDigitArray() {
-        StringBuilder retString = new StringBuilder();
-        for (int i = 0; i < getDataLength(); i++) {
-            byte k = digitArray.get(i);
-            String j = String.valueOf(k);
-            retString.append(j);
-        }
-        System.out.println("DigitArrayString: " + retString);
     }
 
     public void removeDigitLeft() {
@@ -236,30 +173,26 @@ public class CustomNumber {
         }
     }
 
-    public void cropRelevant(int relevant) {
-        this.removeNDigitsRight(this.digitArray.size() - relevant);
+    public void set(CustomNumber number) {
+        sign = number.sign;
+        lengthBeforeComma = number.lengthBeforeComma;
+        lengthAfterComma = number.lengthAfterComma;
+        digitArray = new ArrayList<>(number.digitArray);
+    }
+
+    public void setPhantomZeros() {
+        if (!isZero()) {
+            while (lengthAfterComma < 0) {
+                digitArray.add(digitArray.size(), (byte) 0);
+                lengthAfterComma += 1;
+            }
+        } else {
+            throw new RuntimeException("setPhantomZeros but number is Zero!");
+        }
     }
 
 
-    public void setLAC(int length) {
-        lengthAfterComma = length;
-    }
 
-    public void setLBC(int length) {
-        lengthBeforeComma = length;
-    }
-
-    public void setNeg() {
-        sign = false;
-    }
-
-    public void setPos() {
-        sign = true;
-    }
-
-    public void setSign(boolean singVar) {
-        sign = singVar;
-    }
 
     public void set(String inputString) {
         int lengthTotal;
@@ -358,6 +291,59 @@ public class CustomNumber {
         }
     }
 
+    @Override
+    public String toString() {
+        StringBuilder returnString = new StringBuilder();
+
+        for (int i = 0; i < getDataLength(); i++) {
+            byte k = digitArray.get(i);
+            String j = String.valueOf(k);
+            returnString.append(j);
+        }
+
+        if (lengthBeforeComma < 0 || lengthAfterComma < 0) {
+
+            if (lengthAfterComma < 0) {
+                returnString.append("*".repeat(Math.max(0, (lengthAfterComma * -1))));
+                returnString.append(".");
+            }
+
+            if (lengthBeforeComma < 0) {
+                for (int i = 0; i < (lengthBeforeComma * -1); i++) {
+                    returnString.insert(0, "*");
+                }
+                returnString.insert(0, ".");
+            }
+        } else {
+            String b = returnString.substring(0, lengthBeforeComma);
+            String c = returnString.substring(lengthBeforeComma, getDataLength());
+            returnString = new StringBuilder(b + "." + c);
+        }
+
+        if (isPos() || isZero()) {
+            returnString.insert(0, "+");
+        } else {
+            returnString.insert(0, "-");
+        }
+        return returnString.toString();
+    }
+
+    public void print() {
+        System.out.println("Zahl ist Null:          " + this.isZero());
+        System.out.println("Zahl ist Positiv:       " + this.isPos());
+        if (this.getDigitArray().size() != 0) {
+            System.out.println("Array.get(0) in var:    " + this.getDigitArray().get(0));
+        } else {
+            System.out.println("Array.get(0) in var:    IST NULL");
+        }
+        System.out.println("Stellen vor dem Komma:  " + this.getLBC());
+        System.out.println("Stellen nach dem Komma: " + this.getLAC());
+        System.out.println("Position des Kommas:    nach der " + this.getLBC() + ". Ziffer");
+        System.out.println("Anzahl der Ziffern:     " + this.getDataLength());
+        System.out.println("Zahl:                   " + this);
+        System.out.println("-------------------------------------------------------");
+    }
+
     public void incLBC(int iterations) {
         if (!isZero()) {
             lengthBeforeComma += iterations;
@@ -422,38 +408,35 @@ public class CustomNumber {
         }
     }
 
-    public void setPhantomZeros() {
-        if (!isZero()) {
-            while (lengthAfterComma < 0) {
-                digitArray.add(digitArray.size(), (byte) 0);
-                lengthAfterComma += 1;
-            }
-        } else {
-            throw new RuntimeException("setPhantomZeros but number is Zero!");
-        }
+    public List<Byte> getDigitArray() {
+        return digitArray;
     }
 
-    public boolean areDigitArraysEqual(CustomNumber number1) {
-        if (!(number1.getDataLength() == this.getDataLength())) {
-            return false;
-        }
-
-        return Objects.equals(number1.getDigitArray(), this.getDigitArray());
+    public int getLAC() {
+        return lengthAfterComma;
     }
 
-    public void print() {
-        System.out.println("Zahl ist Null:          " + this.isZero());
-        System.out.println("Zahl ist Positiv:       " + this.isPos());
-        if (this.getDigitArray().size() != 0) {
-            System.out.println("Array.get(0) in var:    " + this.getDigitArray().get(0));
-        } else {
-            System.out.println("Array.get(0) in var:    IST NULL");
-        }
-        System.out.println("Stellen vor dem Komma:  " + this.getLBC());
-        System.out.println("Stellen nach dem Komma: " + this.getLAC());
-        System.out.println("Position des Kommas:    nach der " + this.getLBC() + ". Ziffer");
-        System.out.println("Anzahl der Ziffern:     " + this.getDataLength());
-        System.out.println("Zahl:                   " + this);
-        System.out.println("-------------------------------------------------------");
+    public int getLBC() {
+        return lengthBeforeComma;
+    }
+
+    public void setLAC(int length) {
+        lengthAfterComma = length;
+    }
+
+    public void setLBC(int length) {
+        lengthBeforeComma = length;
+    }
+
+    public void setNeg() {
+        sign = false;
+    }
+
+    public void setPos() {
+        sign = true;
+    }
+
+    public void setSign(boolean singVar) {
+        sign = singVar;
     }
 }
