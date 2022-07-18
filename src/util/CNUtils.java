@@ -1,4 +1,5 @@
-import java.util.Objects;
+package util;
+import datatypes.*;
 
 public class CNUtils {
     public static CustomNumber addUp(CustomNumber summand1, CustomNumber summand2, int relevant) {

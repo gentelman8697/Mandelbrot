@@ -1,3 +1,11 @@
+import datatypes.CustomComplexNumber;
+import datatypes.CustomNumber;
+import disp.CustomColor;
+import disp.CustomColorTransition;
+import disp.PixelArray;
+import util.CCNUtils;
+import util.CNUtils;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -106,39 +114,43 @@ public class Window {
         System.out.println("img   H: " + img.getHeight());
 
 
-		CustomColor testColor2 = new CustomColor((int) (Math.random()*255),255,0,0);
-		CustomColor testColor3 = new CustomColor((int) (Math.random()*255),(int) 0,255,0);
-		CustomColor testColor4 = new CustomColor((int) (Math.random()*255),(int) 0,0,255);
+		CustomColor testColor2 = new CustomColor(255,255,0,0);
+        CustomColor testColor3 = new CustomColor(255,255,255,0);
+        CustomColor testColor4 = new CustomColor(255, 0,255,0);
+		CustomColor testColor5 = new CustomColor(255, 0,255,255);
+        CustomColor testColor6 = new CustomColor(255, 0,0,255);
+        CustomColor testColor7 = new CustomColor(255, 255,0,255);
+        CustomColor testColor8 = new CustomColor(255, 0,0,0);
+
+
 /*
-        CustomColor testColor2 = new CustomColor((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255));
-        CustomColor testColor3 = new CustomColor((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255));
-        CustomColor testColor4 = new CustomColor((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255));
-		CustomColor testColor5 = new CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
-		CustomColor testColor6 = new CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
-		CustomColor testColor7 = new CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
-		CustomColor testColor8 = new CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
-		CustomColor testColor9 = new CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
-		CustomColor testColor10 = new CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
-		CustomColor testColor11 = new CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
-		CustomColor testColor12 = new CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
-		CustomColor testColor13 = new CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
-		CustomColor testColor14 = new CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
-		CustomColor testColor15 = new CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
-		CustomColor testColor16 = new CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
-		CustomColor testColor17 = new CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));*/
+        disp.CustomColor testColor2 = new disp.CustomColor((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255));
+        disp.CustomColor testColor3 = new disp.CustomColor((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255));
+        disp.CustomColor testColor4 = new disp.CustomColor((int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255), (int) (Math.random() * 255));
+		disp.CustomColor testColor5 = new disp.CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
+		disp.CustomColor testColor6 = new disp.CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
+		disp.CustomColor testColor7 = new disp.CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
+		disp.CustomColor testColor8 = new disp.CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
+		disp.CustomColor testColor9 = new disp.CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
+		disp.CustomColor testColor10 = new disp.CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
+		disp.CustomColor testColor11 = new disp.CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
+		disp.CustomColor testColor12 = new disp.CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
+		disp.CustomColor testColor13 = new disp.CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
+		disp.CustomColor testColor14 = new disp.CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
+		disp.CustomColor testColor15 = new disp.CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
+		disp.CustomColor testColor16 = new disp.CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));
+		disp.CustomColor testColor17 = new disp.CustomColor((int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255),(int) (Math.random()*255));*/
 
 
         CustomColor outPutColor = new CustomColor(0, 0, 0, 0);
 
         CustomColorTransition testTransition1 = new CustomColorTransition(testColor2, testColor3);
 
-
         testTransition1.addTransitionColor(testColor4);
-		/*
 		testTransition1.addTransitionColor(testColor5);
 		testTransition1.addTransitionColor(testColor6);
-		testTransition1.addTransitionColor(testColor7); */
-
+		testTransition1.addTransitionColor(testColor7);
+        testTransition1.addTransitionColor(testColor8);
 
         CustomNumber n1 = new CustomNumber();
         CustomNumber n2 = new CustomNumber();
@@ -167,13 +179,13 @@ public class Window {
         int iVal = 0;
         int jVal = 0;
 
-        int accur = 3;
-        int iters = 25;
+        int accur = 6;
+        int iters = 500;
 
 
-        for (CustomNumber i = new CustomNumber("-.75"); CNUtils.isSmaller(i, new CustomNumber("+.75")); i = CNUtils.addUp(i, new CustomNumber("+.00625"))) {
+        for (CustomNumber i = new CustomNumber("-2."); CNUtils.isSmaller(i, new CustomNumber("+1.")); i = CNUtils.addUp(i, new CustomNumber("+.0125"))) {
             System.out.println(i);
-            for (CustomNumber j = new CustomNumber("-.75"); CNUtils.isSmaller(j, new CustomNumber("+.75")); j = CNUtils.addUp(j, new CustomNumber("+.00625"))) {
+            for (CustomNumber j = new CustomNumber("-1.5"); CNUtils.isSmaller(j, new CustomNumber("+1.5")); j = CNUtils.addUp(j, new CustomNumber("+.0125"))) {
                 System.out.print("+");
                 int safeVal = 0;
                 c1 = new CustomComplexNumber(new CustomNumber(), new CustomNumber());

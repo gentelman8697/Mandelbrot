@@ -1,3 +1,6 @@
+package util;
+import datatypes.*;
+
 public class CCNUtils {
     public static CustomComplexNumber addUp(CustomComplexNumber n1, CustomComplexNumber n2, int relevant) {
         return new CustomComplexNumber(CNUtils.addUp(n1.getReal(), n2.getReal(), relevant), CNUtils.addUp(n1.getImag(), n2.getImag(), relevant));

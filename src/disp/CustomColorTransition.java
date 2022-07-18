@@ -1,3 +1,7 @@
+package disp;
+
+import disp.CustomColor;
+
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,7 +1,7 @@
 # Mandelbrot
 
-hi this is michael.
+created by: Bernhard Jung
 
-i do very much hate you.
-
-🍏🍎🇳🇱
+with special thanks to:
+Michael Moser,
+Moritz Schalk

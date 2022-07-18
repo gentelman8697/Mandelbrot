@@ -1,3 +1,5 @@
+package disp;
+
 import java.util.ArrayList;
 
 public class PixelArray {

@@ -1,3 +1,5 @@
+package disp;
+
 public class CustomColor {
 
 	int colorValue = 0;
@@ -60,7 +62,7 @@ public class CustomColor {
 
 	@Override
 	public String toString() {
-		return "CustomColor [colorValue=" + colorValue + ", alpha=" + alpha + ", red=" + red + ", green=" + green
+		return "disp.CustomColor [colorValue=" + colorValue + ", alpha=" + alpha + ", red=" + red + ", green=" + green
 				+ ", blue=" + blue + "]";
 	}
 }

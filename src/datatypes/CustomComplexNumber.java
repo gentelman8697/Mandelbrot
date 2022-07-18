@@ -1,3 +1,5 @@
+package datatypes;
+
 public class CustomComplexNumber {
     private CustomNumber real;
     private CustomNumber imag;
