@@ -179,9 +179,11 @@ public class Window {
         int iVal = 0;
         int jVal = 0;
 
-        int accur = 6;
-        int iters = 200;
+        int accur = 30;
+        int iters = 19;
 
+
+        CustomNumber N2 = new CustomNumber("2.");
 
         for (CustomNumber i = new CustomNumber("-2."); CNUtils.isSmaller(i, new CustomNumber("+1.")); i = CNUtils.addUp(i, new CustomNumber("+.025"))) {
             System.out.println(i);
@@ -194,7 +196,7 @@ public class Window {
                         c1 = CCNUtils.multiply(c1, c1, accur);
                         c1 = CCNUtils.addUp(c1, new CustomComplexNumber(i, j), accur);
                         safeVal = k;
-                        if (CNUtils.isGreater(CCNUtils.absolute(c1, accur/2), new CustomNumber("+2."))) {
+                        if (CNUtils.isGreater(CCNUtils.absolute(c1, accur), N2)) {
                             break;
                         }
                     }

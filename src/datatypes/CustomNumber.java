@@ -2,6 +2,7 @@ package datatypes;
 
 import org.junit.jupiter.api.function.Executable;
 
+//import java.lang.reflect.Executable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,10 +23,10 @@ public class CustomNumber {
     }
 
     public CustomNumber(CustomNumber number) {
-        this.lengthBeforeComma = number.lengthBeforeComma;
-        this.lengthAfterComma = number.lengthAfterComma;
-        this.sign = number.sign;
-        this.digitArray = new ArrayList<>(number.digitArray);
+        lengthBeforeComma = number.lengthBeforeComma;
+        lengthAfterComma = number.lengthAfterComma;
+        sign = number.sign;
+        digitArray = new ArrayList<>(number.digitArray);
     }
 
     public void appendDigitLeft(byte digit) {
@@ -61,8 +62,7 @@ public class CustomNumber {
             }
             lengthAfterComma = lengthAfterComma - reduceAfter;
 
-            if(lengthBeforeComma == lengthAfterComma * -1)
-            {
+            if (lengthBeforeComma == lengthAfterComma * -1) {
                 lengthBeforeComma = 0;
                 lengthAfterComma = 0;
             }
@@ -70,7 +70,7 @@ public class CustomNumber {
     }
 
     public void cropRelevant(int relevant) {
-        this.removeNDigitsRight(this.digitArray.size() - relevant);
+        removeNDigitsRight(digitArray.size() - relevant);
     }
 
     public void evenOut(CustomNumber evenOutNumber) {
@@ -122,13 +122,14 @@ public class CustomNumber {
 
 
         //This is also not needed because the code seems to be consistent!
+        /*
         if((lengthBeforeComma == lengthAfterComma && lengthBeforeComma == 0) && digitArray.size() == 0)
             return true;
         if(lengthBeforeComma != lengthAfterComma*-1  && digitArray.size() != 0)
             return false;
         throw new RuntimeException("oh no :(");
-
-        //return (lengthBeforeComma == lengthAfterComma*-1 || digitArray.size() == 0);
+        */
+        return (lengthBeforeComma == lengthAfterComma * -1 || digitArray.size() == 0);
     }
 
     public void removeDigitLeft() {
@@ -136,7 +137,7 @@ public class CustomNumber {
             digitArray.remove(0);
             lengthBeforeComma -= 1;
         } else {
-            throw new RuntimeException("removeDataDigitLeft but number is Zero!");
+            throw new RuntimeException("removeDigitLeft but number is Zero!");
         }
     }
 
@@ -145,32 +146,28 @@ public class CustomNumber {
             digitArray.remove(getDataLength() - 1);
             lengthAfterComma -= 1;
         } else {
-            throw new RuntimeException("removeDataDigitRight but number is Zero!");
+            throw new RuntimeException("removeDigitRight but number is Zero!");
         }
     }
 
     public void removeNDigitsLeft(int n) {
-        if (!isZero() && n > 0 && n < this.digitArray.size()) {
+        if (!isZero() && n >= 0 && n < digitArray.size()) {
             digitArray.subList(0, n).clear();
             lengthBeforeComma -= n;
-        } else if (this.digitArray.size() == n) {
-            this.lengthAfterComma = 0;
-            this.lengthBeforeComma = 0;
-            this.sign = true;
-            this.digitArray = new ArrayList<>();
+        } else if (digitArray.size() == n) {
+            setZero();
         }
+        // TODO: Change logic to make removeNDigits consistent with removeDigit, in regards to exceptions
     }
 
     public void removeNDigitsRight(int n) {
-        if (!isZero() && n > 0 && n < this.digitArray.size()) {
+        if (!isZero() && n >= 0 && n < digitArray.size()) {
             digitArray.subList(digitArray.size() - n, digitArray.size()).clear();
             lengthAfterComma -= n;
-        } else if (this.digitArray.size() == n) {
-            this.lengthAfterComma = 0;
-            this.lengthBeforeComma = 0;
-            this.sign = true;
-            this.digitArray = new ArrayList<>();
+        } else if (digitArray.size() == n) {
+            setZero();
         }
+        // TODO: Change logic to make removeNDigits consistent with removeDigit, in regards to exceptions
     }
 
     public void set(CustomNumber number) {
@@ -190,9 +187,6 @@ public class CustomNumber {
             throw new RuntimeException("setPhantomZeros but number is Zero!");
         }
     }
-
-
-
 
     public void set(String inputString) {
         int lengthTotal;
@@ -329,17 +323,17 @@ public class CustomNumber {
     }
 
     public void print() {
-        System.out.println("Zahl ist Null:          " + this.isZero());
-        System.out.println("Zahl ist Positiv:       " + this.isPos());
-        if (this.getDigitArray().size() != 0) {
-            System.out.println("Array.get(0) in var:    " + this.getDigitArray().get(0));
+        System.out.println("Zahl ist Null:          " + isZero());
+        System.out.println("Zahl ist Positiv:       " + isPos());
+        if (getDigitArray().size() != 0) {
+            System.out.println("Array.get(0) in var:    " + getDigitArray().get(0));
         } else {
             System.out.println("Array.get(0) in var:    IST NULL");
         }
-        System.out.println("Stellen vor dem Komma:  " + this.getLBC());
-        System.out.println("Stellen nach dem Komma: " + this.getLAC());
-        System.out.println("Position des Kommas:    nach der " + this.getLBC() + ". Ziffer");
-        System.out.println("Anzahl der Ziffern:     " + this.getDataLength());
+        System.out.println("Stellen vor dem Komma:  " + getLBC());
+        System.out.println("Stellen nach dem Komma: " + getLAC());
+        System.out.println("Position des Kommas:    nach der " + getLBC() + ". Ziffer");
+        System.out.println("Anzahl der Ziffern:     " + getDataLength());
         System.out.println("Zahl:                   " + this);
         System.out.println("-------------------------------------------------------");
     }

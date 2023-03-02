@@ -65,7 +65,25 @@ class CustomNumberTest {
 
     @Test
     void cropRelevant() {
-        //TODO
+        CustomNumber n1 = new CustomNumber("123456789.123456789");
+        n1.cropRelevant(17);
+        assertTrue(CNUtils.areEqual(n1, new CustomNumber("123456789.12345678")));
+
+        CustomNumber n2 = new CustomNumber("123456789.123456789");
+        n2.cropRelevant(1);
+        assertTrue(CNUtils.areEqual(n2, new CustomNumber("100000000.")));
+
+        CustomNumber n3 = new CustomNumber("123456789.123456789");
+        n3.cropRelevant(3);
+        assertTrue(CNUtils.areEqual(n3, new CustomNumber("123000000.")));
+
+        CustomNumber n4 = new CustomNumber("123456789.123456789");
+        n4.cropRelevant(0);
+        assertTrue(n4.isZero());
+
+        CustomNumber n5 = new CustomNumber();
+        n5.cropRelevant(3);
+        assertTrue(n5.isZero());
     }
 
     @Test
@@ -134,22 +152,106 @@ class CustomNumberTest {
 
     @Test
     void isZero() {
-        //TODO
+        CustomNumber n1 = new CustomNumber();
+        assertTrue(n1.isZero());
+
+        n1.appendDigitLeft((byte) 0);
+        assertFalse(n1.isZero());
+
+        n1.clean();
+        assertTrue(n1.isZero());
     }
 
     @Test
-    void removeNDataDigitsLeft() {
-        //TODO
+    void removeDigitLeft() {
+        CustomNumber n1 = new CustomNumber("+12.34");
+
+        n1.removeDigitLeft();
+        assertTrue(CNUtils.areEqual(n1, new CustomNumber("+2.34")));
+
+        n1.removeDigitLeft();
+        assertTrue(CNUtils.areEqual(n1, new CustomNumber("+.34")));
+
+        n1.removeDigitLeft();
+        assertTrue(CNUtils.areEqual(n1, new CustomNumber("+.04")));
+
+        n1.removeDigitLeft();
+        assertTrue(n1.isZero());
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, n1::removeDigitLeft);
+        assertEquals("removeDigitLeft but number is Zero!", thrown.getMessage());
     }
 
     @Test
-    void removeNDataDigitsRight() {
-        //TODO
+    void removeDigitRight() {
+        CustomNumber n1 = new CustomNumber("+12.34");
+
+        n1.removeDigitRight();
+        assertTrue(CNUtils.areEqual(n1, new CustomNumber("+12.3")));
+
+        n1.removeDigitRight();
+        assertTrue(CNUtils.areEqual(n1, new CustomNumber("+12.")));
+
+        n1.removeDigitRight();
+        assertTrue(CNUtils.areEqual(n1, new CustomNumber("+10.")));
+
+        n1.removeDigitRight();
+        assertTrue(n1.isZero());
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, n1::removeDigitRight);
+        assertEquals("removeDigitRight but number is Zero!", thrown.getMessage());
+    }
+
+
+    @Test
+    void removeNDigitsLeft() {
+        CustomNumber n1 = new CustomNumber("+123456789.123456789");
+        n1.removeNDigitsLeft(3);
+        assertTrue(CNUtils.areEqual(n1, new CustomNumber("+456789.123456789")));
+
+        n1.removeNDigitsLeft(14);
+        assertTrue(CNUtils.areEqual(n1, new CustomNumber("+.000000009")));
+
+        n1.removeNDigitsLeft(1);
+        assertTrue(n1.isZero());
+
+        n1.removeNDigitsLeft(1);
+        assertTrue(n1.isZero());
+    }
+
+    @Test
+    void removeNDigitsRight() {
+        CustomNumber n1 = new CustomNumber("+123456789.123456789");
+        n1.removeNDigitsRight(3);
+        assertTrue(CNUtils.areEqual(n1, new CustomNumber("+123456789.123456")));
+
+        n1.removeNDigitsRight(14);
+        assertTrue(CNUtils.areEqual(n1, new CustomNumber("+100000000.")));
+
+        n1.removeNDigitsRight(1);
+        assertTrue(n1.isZero());
+
+        n1.removeNDigitsRight(1);
+        assertTrue(n1.isZero());
     }
 
     @Test
     void setPhantomZeros() {
-        //TODO
+        CustomNumber n1 = new CustomNumber("+1234.");
+        CustomNumber n2 = new CustomNumber("+1234.");
+        n1.setPhantomZeros();
+        assertTrue(CNUtils.areEqual(n1, n2));
+
+        CustomNumber n3 = new CustomNumber("+1200.");
+        CustomNumber n4 = new CustomNumber("+1200.");
+        n4.appendDigitRight((byte) 0);
+        n4.appendDigitRight((byte) 0);
+        n3.setPhantomZeros();
+        assertTrue(CNUtils.areEqual(n3, n4));
+
+        CustomNumber n5 = new CustomNumber();
+        RuntimeException thrown = assertThrows(RuntimeException.class, n5::setPhantomZeros);
+        assertEquals("setPhantomZeros but number is Zero!", thrown.getMessage());
     }
 
     @Test
@@ -175,21 +277,58 @@ class CustomNumberTest {
 
     @Test
     void setZero() {
-        //TODO
+        CustomNumber n1 = new CustomNumber("-123.456");
+        assertFalse(n1.isZero());
+        assertTrue(n1.isNeg());
+        assertEquals(3, n1.getLBC());
+        assertEquals(3, n1.getLAC());
+        assertEquals(6, n1.getDataLength());
+        assertEquals(6, n1.getDigitArray().size());
+
+        n1.setZero();
+        assertTrue(n1.isZero());
+        assertTrue(n1.isPos());
+        assertEquals(0, n1.getLBC());
+        assertEquals(0, n1.getLAC());
+        assertEquals(0, n1.getDataLength());
+        assertEquals(0, n1.getDigitArray().size());
     }
 
     @Test
     void shiftLeft() {
-        //TODO
+        CustomNumber n1 = new CustomNumber("+100.");
+        CustomNumber n2 = new CustomNumber("+1.");
+        CustomNumber n3 = new CustomNumber("+1.");
+
+        n2.shiftLeft();
+        n2.shiftLeft();
+
+        n3.shiftLeft(2);
+        assertTrue(CNUtils.areEqual(n1, n2));
+        assertTrue(CNUtils.areEqual(n2, n3));
+
+        CustomNumber n4 = new CustomNumber();
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, n4::shiftLeft);
+        assertEquals("shiftLeft but number is Zero!", thrown.getMessage());
     }
 
     @Test
     void shiftRight() {
-        //TODO
-    }
+        CustomNumber n1 = new CustomNumber("+1.");
+        CustomNumber n2 = new CustomNumber("+100.");
+        CustomNumber n3 = new CustomNumber("+100.");
 
-    @Test
-    void testToString() {
-        //TODO
+        n2.shiftRight();
+        n2.shiftRight();
+
+        n3.shiftRight(2);
+        assertTrue(CNUtils.areEqual(n1, n2));
+        assertTrue(CNUtils.areEqual(n2, n3));
+
+        CustomNumber n4 = new CustomNumber();
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, n4::shiftRight);
+        assertEquals("shiftRight but number is Zero!", thrown.getMessage());
     }
 }
