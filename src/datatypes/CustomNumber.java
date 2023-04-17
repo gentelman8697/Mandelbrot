@@ -294,7 +294,7 @@ public class CustomNumber {
             String j = String.valueOf(k);
             returnString.append(j);
         }
-
+        //TODO SIMPLIFY IF TO ELSE IF CHAIN
         if (lengthBeforeComma < 0 || lengthAfterComma < 0) {
 
             if (lengthAfterComma < 0) {
@@ -314,6 +314,7 @@ public class CustomNumber {
             returnString = new StringBuilder(b + "." + c);
         }
 
+        //TODO REWORK THIS
         if (isPos() || isZero()) {
             returnString.insert(0, "+");
         } else {
