@@ -21,89 +21,220 @@ public class CNUtils {
         return number1.getDigitArray().equals(number2.getDigitArray());
     }
 
+    /**
+     * Divides the given dividend by the given divisor and returns the result as a CustomNumber.
+     *
+     * Preconditions:
+     * - dividend and divisor must be non-null CustomNumber instances.
+     * - divisor must not be zero.
+     *
+     * Postconditions:
+     * - The returned CustomNumber represents the result of the division operation.
+     * - The dividend and divisor CustomNumbers are not changed during the operation.
+     *
+     * @param dividend The dividend CustomNumber.
+     * @param divisor The divisor CustomNumber.
+     * @param relevant The number of decimal places to keep after division.
+     * @return The result of the division as a CustomNumber.
+     * @throws RuntimeException If divisor is zero.
+     */
     public static CustomNumber divide(CustomNumber dividend, CustomNumber divisor, int relevant) {
-        CustomNumber retCustomNumber = new CustomNumber();
-        boolean dividendPos = dividend.isPos();
-        boolean divisorPos = divisor.isPos();
+        CustomNumber retVal = new CustomNumber();
+        boolean dividendSign = dividend.isPos();
+        boolean divisorSign = divisor.isPos();
 
+        // Set both dividend and divisor as positive to handle division of signed numbers.
         dividend.setPos();
         divisor.setPos();
+
+        // Check if divisor is zero and throw an exception if it is.
         if (divisor.isZero()) {
-            dividend.setSign(dividendPos);
-            divisor.setSign(divisorPos);
-            retCustomNumber.setSign(divisorPos == dividendPos);
+            dividend.setSign(dividendSign);
+            divisor.setSign(divisorSign);
+            retVal.setSign(divisorSign == dividendSign);
             dividend.print();
             divisor.print();
             throw new RuntimeException("STOP YOU VIOLATED THE LAW ! (div by zero)");
         } else if (dividend.isZero()) {
-            dividend.setSign(dividendPos);
-            divisor.setSign(divisorPos);
-            retCustomNumber.setZero();
+            // If dividend is zero, set the retVal to zero and set its sign accordingly.
+            dividend.setSign(dividendSign);
+            divisor.setSign(divisorSign);
+            retVal.setZero();
         } else if (areEqual(dividend, divisor)) {
-            dividend.setSign(dividendPos);
-            divisor.setSign(divisorPos);
-            retCustomNumber.set("+1.");
-            retCustomNumber.setSign(divisorPos == dividendPos);
+            // If dividend and divisor are equal, set retVal to 1 and set its sign accordingly.
+            dividend.setSign(dividendSign);
+            divisor.setSign(divisorSign);
+            retVal.set("+1.");
+            retVal.setSign(divisorSign == dividendSign);
         } else if (isSmaller(dividend, divisor)) {
-            CustomNumber workDividend = new CustomNumber();
-            CustomNumber workDivisor = new CustomNumber();
-            workDividend.set(dividend);
-            workDivisor.set(divisor);
-            int maxAfter = Math.max(dividend.getLAC(), divisor.getLAC());
-            workDividend.shiftLeft(maxAfter);
-            workDivisor.shiftLeft(maxAfter);
-            workDividend.setPhantomZeros();
-            workDivisor.setPhantomZeros();
+            // If dividend is smaller than divisor, call internalDivisionDividendSmallThanDivisor.
+            internalDivisionDividendSmallThanDivisor(dividend, divisor, retVal);
+            retVal.setSign(divisorSign == dividendSign);
+            dividend.setSign(dividendSign);
+            divisor.setSign(divisorSign);
+        } else {
+            // If divisor is smaller than dividend, call internalDivisionDivisorSmallThanDividend.
+            internalDivisionDivisorSmallThanDividend(dividend, divisor, retVal);
+            retVal.setSign(divisorSign == dividendSign);
+            dividend.setSign(dividendSign);
+            divisor.setSign(divisorSign);
+        }
 
-            while (isGreater(workDividend, workDivisor)) {
+        // Crop the result to the specified number of relevant decimal places.
+        retVal.cropRelevant(relevant);
+        return retVal;
+    }
+
+    /**
+     * Helper function for the division operation when the dividend is smaller than the divisor.
+     *
+     * Preconditions:
+     * - dividend, divisor, and retVal must be non-null CustomNumber instances.
+     *
+     * Postconditions:
+     * - retVal will contain the result of the division operation with the given dividend and divisor.
+     *
+     * @param dividend The dividend CustomNumber.
+     * @param divisor The divisor CustomNumber.
+     * @param retVal The CustomNumber that will store the result of the division operation.
+     */
+    private static void internalDivisionDividendSmallThanDivisor(CustomNumber dividend, CustomNumber divisor,
+                                                                 CustomNumber retVal) {
+        CustomNumber workDividend = new CustomNumber();
+        CustomNumber workDivisor = new CustomNumber();
+        workDividend.set(dividend);
+        workDivisor.set(divisor);
+
+        // Shift left both dividend and divisor to align their most significant digits.
+        int maxAfter = Math.max(dividend.getLAC(), divisor.getLAC());
+        workDividend.shiftLeft(maxAfter);
+        workDivisor.shiftLeft(maxAfter);
+
+        // Set phantom zeros for both workDividend and workDivisor.
+        workDividend.setPhantomZeros();
+        workDivisor.setPhantomZeros();
+
+        // Ensure workDividend is greater or equal to workDivisor.
+        while (isGreater(workDividend, workDivisor)) {
+            workDividend.appendDigitRight((byte) 0);
+        }
+
+        byte addDigit = 0;
+        int precisionEscapeCounter = 0;
+        // Loop until the desired precision is reached.
+        while (precisionEscapeCounter < workDividend.getDataLength() + workDivisor.getDataLength() + 5) {
+            // Subtract workDivisor from workDividend as long as it is greater or equal.
+            while (isGreaterOrEqual(workDividend, workDivisor)) {
+                workDividend = subTr(workDividend, workDivisor, -1);
+                addDigit++;
+            }
+            // Append the digit obtained from the subtraction to retVal.
+            retVal.appendDigitRight(addDigit);
+
+            // Break the loop if workDividend becomes zero.
+            if (workDividend.isZero()) {
+                break;
+            }
+
+            // Shift workDividend left and reset addDigit and precisionEscapeCounter.
+            workDividend.appendDigitRight((byte) 0);
+            workDividend.shiftLeft();
+            addDigit = 0;
+            precisionEscapeCounter++;
+        }
+
+        // Shift retVal left and clean trailing zeros.
+        retVal.shiftLeft();
+        retVal.clean();
+    }
+
+    /**
+     * Helper function for the division operation when the divisor is smaller than the dividend.
+     *
+     * Preconditions:
+     * - dividend, divisor, and retVal must be non-null CustomNumber instances.
+     *
+     * Postconditions:
+     * - retVal will contain the result of the division operation with the given dividend and divisor.
+     *
+     * @param dividend The dividend CustomNumber.
+     * @param divisor The divisor CustomNumber.
+     * @param retVal The CustomNumber that will store the result of the division operation.
+     */
+    private static void internalDivisionDivisorSmallThanDividend(CustomNumber dividend, CustomNumber divisor,
+                                                                 CustomNumber retVal) {
+        CustomNumber shiftedDividend = new CustomNumber();
+        CustomNumber workDivisor = new CustomNumber();
+        shiftedDividend.set(dividend);
+        workDivisor.set(divisor);
+
+        // Shift left both dividend and divisor to align their most significant digits.
+        int maxAfter = Math.max(dividend.getLAC(), divisor.getLAC());
+        shiftedDividend.shiftLeft(maxAfter);
+        workDivisor.shiftLeft(maxAfter);
+
+        // Set phantom zeros for both shiftedDividend and workDivisor.
+        shiftedDividend.setPhantomZeros();
+        workDivisor.setPhantomZeros();
+
+        CustomNumber workDividend = new CustomNumber();
+        workDividend.set(shiftedDividend);
+
+        // Calculate the difference between dividend's and divisor's least significant digits.
+        int diffLBC = dividend.getLBC() - divisor.getLBC();
+
+        // Remove the least significant digits from workDividend.
+        for (int i = 0; i < diffLBC; i++) {
+            workDividend.removeDigitRight();
+        }
+        workDividend.shiftRight(diffLBC);
+
+        // Process the digits before the comma.
+        byte addDigit = 0;
+        for (int i = 0; i < diffLBC; i++) {
+            // Subtract workDivisor from workDividend as long as it is greater or equal.
+            while (isGreaterOrEqual(workDividend, workDivisor)) {
+                workDividend = subTr(workDividend, workDivisor, -1);
+                addDigit++;
+            }
+            // Append the digit obtained from the subtraction to retVal.
+            retVal.appendDigitRight(addDigit);
+            addDigit = 0;
+
+            // Fill the gap with zeros and append the next digit from shiftedDividend.
+            while (workDividend.getLAC() < 0) {
                 workDividend.appendDigitRight((byte) 0);
             }
-
-            internalDivisionAfterComma(workDividend, workDivisor, retCustomNumber);
-            retCustomNumber.shiftLeft();
-            retCustomNumber.clean();
-            retCustomNumber.setSign(divisorPos == dividendPos);
-            dividend.setSign(dividendPos);
-            divisor.setSign(divisorPos);
-        } else {
-            CustomNumber workDividend = new CustomNumber();
-            CustomNumber workDivisor = new CustomNumber();
-            workDividend.set(dividend);
-            workDivisor.set(divisor);
-            int maxAfter = Math.max(dividend.getLAC(), divisor.getLAC());
-            workDividend.shiftLeft(maxAfter);
-            workDivisor.shiftLeft(maxAfter);
-            workDividend.setPhantomZeros();
-            workDivisor.setPhantomZeros();
-            CustomNumber tempDividend = new CustomNumber();
-            tempDividend.set(workDividend);
-
-            int newDiff = dividend.getLBC() - divisor.getLBC();
-            for (int i = 0; i < newDiff; i++) {
-                tempDividend.removeDigitRight();
-            }
-            tempDividend.shiftRight(newDiff);
-
-            byte addVal = 0;
-            for (int i = 0; i < newDiff; i++) {
-                while (isGreaterOrEqual(tempDividend, workDivisor)) {
-                    tempDividend = subTr(tempDividend, workDivisor, -1);
-                    addVal++;
-                }
-                retCustomNumber.appendDigitRight(addVal);
-                addVal = 0;
-                tempDividend.appendDigitRight(workDividend.getDigitArray().get(workDividend.getDataLength() - (newDiff - i)));
-                tempDividend.shiftLeft();
-            }
-            internalDivisionAfterComma(tempDividend, workDivisor, retCustomNumber);
-            retCustomNumber.shiftLeft(newDiff + 1);
-            retCustomNumber.clean();
-            retCustomNumber.setSign(divisorPos == dividendPos);
-            dividend.setSign(dividendPos);
-            divisor.setSign(divisorPos);
+            workDividend.appendDigitRight(shiftedDividend.getDigitArray().get(shiftedDividend.getDataLength() - (diffLBC - i)));
+            workDividend.shiftLeft();
         }
-        retCustomNumber.cropRelevant(relevant);
-        return retCustomNumber;
+
+        // Process the digits after the comma.
+        int precisionEscapeCounter = 0;
+        while (precisionEscapeCounter < workDividend.getDataLength() + workDivisor.getDataLength() + 5) {
+            // Subtract workDivisor from workDividend as long as it is greater or equal.
+            while (isGreaterOrEqual(workDividend, workDivisor)) {
+                workDividend = subTr(workDividend, workDivisor, -1);
+                addDigit++;
+            }
+            // Append the digit obtained from the subtraction to retVal.
+            retVal.appendDigitRight(addDigit);
+
+            // Break the loop if workDividend becomes zero.
+            if (workDividend.isZero()) {
+                break;
+            }
+
+            // Shift workDividend left and reset addDigit and precisionEscapeCounter.
+            workDividend.appendDigitRight((byte) 0);
+            workDividend.shiftLeft();
+            addDigit = 0;
+            precisionEscapeCounter++;
+        }
+
+        // Shift retVal left by (diffLBC + 1) positions and remove any trailing zeros.
+        retVal.shiftLeft(diffLBC + 1);
+        retVal.clean();
     }
 
     public static CustomNumber exp(CustomNumber number, int exp, int relevant) {
@@ -148,66 +279,89 @@ public class CNUtils {
         return new CustomNumber(divide(dividend, divisor, -1));
     }
 
+    /**
+     * Multiplies two CustomNumber objects and returns the product.
+     *
+     * Preconditions:
+     * - factor1 and factor2 must be non-null CustomNumber objects.
+     * - relevant must be a non-negative integer.
+     *
+     * Postconditions:
+     * - The returned CustomNumber object will be the product of factor1 and factor2.
+     * - The returned CustomNumber object will have the sign set correctly based on the signs of factor1 and factor2.
+     * - The returned CustomNumber object will have the specified number of significant digits (relevant).
+     * - Neither factor1 nor factor2 will be modified during the calculation.
+     *
+     * @param factor1 The first factor for the multiplication.
+     * @param factor2 The second factor for the multiplication.
+     * @param relevant The number of significant digits to be kept in the result.
+     * @return The product of factor1 and factor2 as a CustomNumber object.
+     */
     public static CustomNumber multiply(CustomNumber factor1, CustomNumber factor2, int relevant) {
-        CustomNumber returnCustomNumber = new CustomNumber();
+        CustomNumber retVal = new CustomNumber();
 
+        // Handle cases where either factor is zero.
         if (factor1.isZero() || factor2.isZero()) {
-            returnCustomNumber.setZero();
+            retVal.setZero();
         } else if (factor1.getDataLength() == 1) {
+            // Handle cases where the first factor has a single digit.
             switch (factor1.getDigitArray().get(0)) {
                 case (byte) 1 -> {
-                    returnCustomNumber.set(factor2);
+                    retVal.set(factor2);
                     if (factor1.getLBC() > 1) {
-                        returnCustomNumber.shiftLeft(factor1.getLBC() - 1);
+                        retVal.shiftLeft(factor1.getLBC() - 1);
                     } else if (factor1.getLBC() < 1) {
-                        returnCustomNumber.shiftRight((factor1.getLBC() * -1) + 1);
+                        retVal.shiftRight((factor1.getLBC() * -1) + 1);
                     }
                 }
                 case (byte) 2 -> {
-                    returnCustomNumber = addUp(factor2, factor2, relevant);
+                    retVal = addUp(factor2, factor2, relevant);
                     if (factor1.getLBC() > 1) {
-                        returnCustomNumber.shiftLeft(factor1.getLBC() - 1);
+                        retVal.shiftLeft(factor1.getLBC() - 1);
                     } else if (factor1.getLBC() < 1) {
-                        returnCustomNumber.shiftRight((factor1.getLBC() * -1) + 1);
+                        retVal.shiftRight((factor1.getLBC() * -1) + 1);
                     }
                 }
-                default -> returnCustomNumber = internalMultiplication(factor2, factor1);
+                default -> retVal = internalMultiplication(factor2, factor1);
             }
         } else if (factor2.getDataLength() == 1) {
+            // Handle cases where the second factor has a single digit.
             switch (factor2.getDigitArray().get(0)) {
                 case (byte) 1 -> {
-                    returnCustomNumber.set(factor1);
+                    retVal.set(factor1);
                     if (factor2.getLBC() > 1) {
-                        returnCustomNumber.shiftLeft(factor2.getLBC() - 1);
+                        retVal.shiftLeft(factor2.getLBC() - 1);
                     } else if (factor2.getLBC() < 1) {
-                        returnCustomNumber.shiftRight((factor2.getLBC() * -1) + 1);
+                        retVal.shiftRight((factor2.getLBC() * -1) + 1);
                     }
                 }
                 case (byte) 2 -> {
-                    returnCustomNumber = addUp(factor1, factor1, relevant);
+                    retVal = addUp(factor1, factor1, relevant);
                     if (factor2.getLBC() > 1) {
-                        returnCustomNumber.shiftLeft(factor2.getLBC() - 1);
+                        retVal.shiftLeft(factor2.getLBC() - 1);
                     } else if (factor2.getLBC() < 1) {
-                        returnCustomNumber.shiftRight((factor2.getLBC() * -1) + 1);
+                        retVal.shiftRight((factor2.getLBC() * -1) + 1);
                     }
                 }
-                default -> returnCustomNumber = internalMultiplication(factor1, factor2);
+                default -> retVal = internalMultiplication(factor1, factor2);
             }
         } else {
+            // Handle cases where both factors have multiple digits.
             if (factor2.getDataLength() > factor1.getDataLength()) {
-                returnCustomNumber = internalMultiplication(factor2, factor1);
+                retVal = internalMultiplication(factor2, factor1);
             } else {
-                returnCustomNumber = internalMultiplication(factor1, factor2);
+                retVal = internalMultiplication(factor1, factor2);
             }
         }
 
+        // Set the sign of the result.
         if (factor1.isPos() != factor2.isPos()) {
-            returnCustomNumber.setNeg();
+            retVal.setNeg();
         } else {
-            returnCustomNumber.setPos();
+            retVal.setPos();
         }
-        returnCustomNumber.cropRelevant(relevant);
-        return returnCustomNumber;
+        retVal.cropRelevant(relevant);
+        return retVal;
     }
 
     public static CustomNumber multiply(CustomNumber factor1, CustomNumber factor2) {
@@ -331,10 +485,10 @@ public class CNUtils {
     }
 
     public static CustomNumber subTr(CustomNumber minuend, CustomNumber subtrahend, int relevant) {
-        CustomNumber returnCustomNumber = new CustomNumber();
-        returnCustomNumber = addUpSubtractionLogic(minuend, subtrahend, false);
-        returnCustomNumber.cropRelevant(relevant);
-        return returnCustomNumber;
+        CustomNumber retVal = new CustomNumber();
+        retVal = addUpSubtractionLogic(minuend, subtrahend, false);
+        retVal.cropRelevant(relevant);
+        return retVal;
     }
 
     public static CustomNumber subTr(CustomNumber minuend, CustomNumber subtrahend) {
@@ -374,7 +528,7 @@ public class CNUtils {
      */
 
     private static CustomNumber addUpSubtractionLogic(CustomNumber number1, CustomNumber number2, boolean mode) {
-        CustomNumber returnCustomNumber = new CustomNumber();
+        CustomNumber retVal = new CustomNumber();
         boolean number1Positive = number1.isPos();
         boolean number1Negative = number1.isNeg();
         boolean number2Positive = number2.isPos();
@@ -384,69 +538,69 @@ public class CNUtils {
 
         if (areEqual(number1, number2)) {
             if (number1Positive && mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase1(number1, number2);
+                retVal = addUpSubtractionLogicCase1(number1, number2);
             } else if (number1Positive && mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase0();
+                retVal = addUpSubtractionLogicCase0();
             } else if (number1Positive && !mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase0();
+                retVal = addUpSubtractionLogicCase0();
             } else if (number1Positive && !mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase1(number1, number2);
+                retVal = addUpSubtractionLogicCase1(number1, number2);
             } else if (number1Negative && mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase0();
+                retVal = addUpSubtractionLogicCase0();
             } else if (number1Negative && mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase2(number1, number2);
+                retVal = addUpSubtractionLogicCase2(number1, number2);
             } else if (number1Negative && !mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase2(number1, number2);
+                retVal = addUpSubtractionLogicCase2(number1, number2);
             } else if (number1Negative && !mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase0();
+                retVal = addUpSubtractionLogicCase0();
             }
         } else if (isGreater(number1, number2)) {
             if (number1Positive && mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase1(number1, number2);
+                retVal = addUpSubtractionLogicCase1(number1, number2);
             } else if (number1Positive && mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase3(number1, number2);
+                retVal = addUpSubtractionLogicCase3(number1, number2);
             } else if (number1Positive && !mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase3(number1, number2);
+                retVal = addUpSubtractionLogicCase3(number1, number2);
             } else if (number1Positive && !mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase1(number1, number2);
+                retVal = addUpSubtractionLogicCase1(number1, number2);
             } else if (number1Negative && mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase4(number1, number2);
+                retVal = addUpSubtractionLogicCase4(number1, number2);
             } else if (number1Negative && mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase2(number1, number2);
+                retVal = addUpSubtractionLogicCase2(number1, number2);
             } else if (number1Negative && !mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase2(number1, number2);
+                retVal = addUpSubtractionLogicCase2(number1, number2);
             } else if (number1Negative && !mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase4(number1, number2);
+                retVal = addUpSubtractionLogicCase4(number1, number2);
             }
         } else if (isSmaller(number1, number2)) {
             if (number1Positive && mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase1(number1, number2);
+                retVal = addUpSubtractionLogicCase1(number1, number2);
             } else if (number1Positive && mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase6(number1, number2);
+                retVal = addUpSubtractionLogicCase6(number1, number2);
             } else if (number1Positive && !mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase6(number1, number2);
+                retVal = addUpSubtractionLogicCase6(number1, number2);
             } else if (number1Positive && !mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase1(number1, number2);
+                retVal = addUpSubtractionLogicCase1(number1, number2);
             } else if (number1Negative && mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase5(number1, number2);
+                retVal = addUpSubtractionLogicCase5(number1, number2);
             } else if (number1Negative && mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase2(number1, number2);
+                retVal = addUpSubtractionLogicCase2(number1, number2);
             } else if (number1Negative && !mode && number2Positive) {
-                returnCustomNumber = addUpSubtractionLogicCase2(number1, number2);
+                retVal = addUpSubtractionLogicCase2(number1, number2);
             } else if (number1Negative && !mode && number2Negative) {
-                returnCustomNumber = addUpSubtractionLogicCase5(number1, number2);
+                retVal = addUpSubtractionLogicCase5(number1, number2);
             }
         }
         number1.setSign(number1Positive);
         number2.setSign(number2Positive);
 
-        return returnCustomNumber;
+        return retVal;
     }
 
     private static CustomNumber addUpSubtractionLogicCase0() {
-        CustomNumber returnCustomNumber = new CustomNumber();
-        returnCustomNumber.setZero();
-        return returnCustomNumber;
+        CustomNumber retVal = new CustomNumber();
+        retVal.setZero();
+        return retVal;
     }
 
     private static CustomNumber addUpSubtractionLogicCase1(CustomNumber number1, CustomNumber number2) {
@@ -454,9 +608,9 @@ public class CNUtils {
     }
 
     private static CustomNumber addUpSubtractionLogicCase2(CustomNumber number1, CustomNumber number2) {
-        CustomNumber returnCustomNumber = internalAddition(number1, number2);
-        returnCustomNumber.setNeg();
-        return returnCustomNumber;
+        CustomNumber retVal = internalAddition(number1, number2);
+        retVal.setNeg();
+        return retVal;
     }
 
     private static CustomNumber addUpSubtractionLogicCase3(CustomNumber number1, CustomNumber number2) {
@@ -464,9 +618,9 @@ public class CNUtils {
     }
 
     private static CustomNumber addUpSubtractionLogicCase4(CustomNumber number1, CustomNumber number2) {
-        CustomNumber returnCustomNumber = internalSubtraction(number1, number2);
-        returnCustomNumber.setNeg();
-        return returnCustomNumber;
+        CustomNumber retVal = internalSubtraction(number1, number2);
+        retVal.setNeg();
+        return retVal;
     }
 
     private static CustomNumber addUpSubtractionLogicCase5(CustomNumber number1, CustomNumber number2) {
@@ -474,16 +628,16 @@ public class CNUtils {
     }
 
     private static CustomNumber addUpSubtractionLogicCase6(CustomNumber number1, CustomNumber number2) {
-        CustomNumber returnCustomNumber = internalSubtraction(number2, number1);
-        returnCustomNumber.setNeg();
-        return returnCustomNumber;
+        CustomNumber retVal = internalSubtraction(number2, number1);
+        retVal.setNeg();
+        return retVal;
     }
 
     /* Adds up the absolute values of two Summa-nds
     Sign of the returnNumber always positive
  */
     private static CustomNumber internalAddition(CustomNumber summand1, CustomNumber summand2) {
-        CustomNumber returnCustomNumber = new CustomNumber();
+        CustomNumber retVal = new CustomNumber();
 
         if (!summand1.isZero() && !summand2.isZero()) {
             byte carry = 0;
@@ -492,8 +646,8 @@ public class CNUtils {
                 summand2.evenOut(summand1);
             }
 
-            returnCustomNumber.setLBC(summand1.getLBC());
-            returnCustomNumber.setLAC(summand1.getLAC());
+            retVal.setLBC(summand1.getLBC());
+            retVal.setLAC(summand1.getLAC());
 
             for (int i = summand1.getDataLength() - 1; i >= 0 || carry != 0; i--) {
                 byte tempDigitResult = 0;
@@ -505,70 +659,67 @@ public class CNUtils {
                     carry = 0;
                 }
 
-                returnCustomNumber.getDigitArray().add(0, tempDigitResult);
+                retVal.getDigitArray().add(0, tempDigitResult);
                 if (i == 0 && carry != 0) {
-                    returnCustomNumber.getDigitArray().add(0, carry);
-                    returnCustomNumber.incLBC();
+                    retVal.getDigitArray().add(0, carry);
+                    retVal.incLBC();
                     carry = 0;
                 }
             }
         } else {
             if (summand2.isZero() && !summand1.isZero()) {
-                returnCustomNumber.set(summand1);
+                retVal.set(summand1);
             }
             if (summand1.isZero() && !summand2.isZero()) {
-                returnCustomNumber.set(summand2);
+                retVal.set(summand2);
             }
             if (summand1.isZero() && summand2.isZero()) {
-                returnCustomNumber.setZero();
+                retVal.setZero();
             }
         }
         summand1.clean();
         summand2.clean();
-        returnCustomNumber.clean();
-        return returnCustomNumber;
+        retVal.clean();
+        return retVal;
     }
 
-    private static void internalDivisionAfterComma(CustomNumber dividend, CustomNumber divisor, CustomNumber retCustomNumber) {
-        byte addVal = 0;
-        int count = 0;
-        while (count < dividend.getDataLength() + divisor.getDataLength() + 5) {
-            while (isGreaterOrEqual(dividend, divisor)) {
-                dividend = subTr(dividend, divisor, -1);
-                addVal++;
-            }
-            retCustomNumber.appendDigitRight(addVal);
-            if (dividend.isZero()) {
-                break;
-            }
-            dividend.appendDigitRight((byte) 0);
-            dividend.shiftLeft();
-            addVal = 0;
-            count++;
-        }
-    }
-
-    /* multiplies 2 Numbers; always returns a positive result */
+    /**
+     * Multiplies two CustomNumber objects and returns the result as a new CustomNumber object.
+     *
+     * Preconditions:
+     * - factor1 and factor2 are non-null CustomNumber objects.
+     *
+     * Postconditions:
+     * - The returned CustomNumber object represents the product of factor1 and factor2 and is positive.
+     * - The original CustomNumber objects (factor1 and factor2) are not modified.
+     *
+     * @param factor1 The first CustomNumber object to be multiplied.
+     * @param factor2 The second CustomNumber object to be multiplied.
+     * @return A new CustomNumber object representing the product of factor1 and factor2.
+     */
     private static CustomNumber internalMultiplication(CustomNumber factor1, CustomNumber factor2) {
-        CustomNumber returnCustomNumber = new CustomNumber();
+        // Initialize temporary CustomNumber objects for computation
+        CustomNumber retVal = new CustomNumber();
         CustomNumber tempFactor1 = new CustomNumber();
         CustomNumber tempFactor2 = new CustomNumber();
         CustomNumber lineResult = new CustomNumber();
 
         int digitsCountToShiftRight = 0;
-        returnCustomNumber.setZero();
+        retVal.setZero();
 
+        // Calculate the number of digits to shift right after multiplication
         if (factor1.getLAC() > 0) {
             digitsCountToShiftRight = digitsCountToShiftRight + factor1.getLAC();
         }
-
         if (factor2.getLAC() > 0) {
             digitsCountToShiftRight = digitsCountToShiftRight + factor2.getLAC();
         }
 
+        // Set the temporary factors to the input factors
         tempFactor1.set(factor1);
         tempFactor2.set(factor2);
 
+        // Adjust the LBC and LAC of temporary factors
         if (tempFactor1.getLAC() > 0) {
             tempFactor1.setLBC(tempFactor1.getLBC() + tempFactor1.getLAC());
             tempFactor1.setLAC(0);
@@ -578,7 +729,9 @@ public class CNUtils {
             tempFactor2.setLAC(0);
         }
 
+        // Perform the multiplication
         for (int i = 0; i < tempFactor2.getDataLength(); i++) {
+            // Multiply each digit of tempFactor2 by tempFactor1
             switch (tempFactor2.getDigitArray().get(i)) {
                 case 0 -> lineResult.setZero();
                 case 1 -> lineResult.set(tempFactor1);
@@ -589,16 +742,19 @@ public class CNUtils {
                 }
             }
 
+            // Shift the result based on the position of the digit
             if (!lineResult.isZero()) //FIXME: this if should not be needed, rework multiplication
             {
                 lineResult.shiftLeft(tempFactor2.getLBC() - i - 1);
             }
-            returnCustomNumber = internalAddition(lineResult, returnCustomNumber);
+            retVal = internalAddition(lineResult, retVal);
         }
+
+        // Shift the result to the right by the calculated number of digits
         if (digitsCountToShiftRight > 0) {
-            returnCustomNumber.shiftRight(digitsCountToShiftRight);
+            retVal.shiftRight(digitsCountToShiftRight);
         }
-        return returnCustomNumber;
+        return retVal;
     }
 
     /*
@@ -615,9 +771,9 @@ public class CNUtils {
         Rückgabewerte sind immer ganze Zahlen ohne Nachkommastellen.
     */
     private static CustomNumber internalOneDigitMultiplication(CustomNumber factor, byte digitFactor) {
-        CustomNumber retCustomNumber = new CustomNumber();
+        CustomNumber retVal = new CustomNumber();
         if (factor.isZero() || digitFactor == 0) {
-            retCustomNumber.setZero();
+            retVal.setZero();
         } else {
 
             while (factor.getDigitArray().size() < factor.getLBC()) {
@@ -633,22 +789,22 @@ public class CNUtils {
                 digitResult = (byte) ((tempDigitResult) % 10);
                 carry = (byte) (tempDigitResult / 10);
 
-                retCustomNumber.appendDigitLeft(digitResult);
+                retVal.appendDigitLeft(digitResult);
                 if (i == 0 && carry != 0) {
-                    retCustomNumber.getDigitArray().add(0, carry);
-                    retCustomNumber.incLBC();
+                    retVal.getDigitArray().add(0, carry);
+                    retVal.incLBC();
                     carry = 0;
                 }
             }
         }
-        return retCustomNumber;
+        return retVal;
     }
 
     /* Minuend and Subtrahend must be positive
        Minuend must be bigger than the Subtrahend
      */
     private static CustomNumber internalSubtraction(CustomNumber minuend, CustomNumber subtrahend) {
-        CustomNumber returnCustomNumber = new CustomNumber();
+        CustomNumber retVal = new CustomNumber();
         byte carry = 0;
 
         if (!subtrahend.isZero()) {
@@ -665,24 +821,24 @@ public class CNUtils {
                     carry = 1;
                 }
 
-                returnCustomNumber.appendDigitLeft(tempDigitResult);
+                retVal.appendDigitLeft(tempDigitResult);
             }
 
             if (minuend.getLAC() > 0) {
-                returnCustomNumber.shiftRight(minuend.getLAC());
+                retVal.shiftRight(minuend.getLAC());
             }
             if (minuend.getLAC() < 0) {
-                returnCustomNumber.shiftLeft(minuend.getLAC() * -1);
+                retVal.shiftLeft(minuend.getLAC() * -1);
             }
 
             minuend.clean();
             subtrahend.clean();
-            returnCustomNumber.clean();
+            retVal.clean();
         } else {
-            returnCustomNumber.set(minuend);
+            retVal.set(minuend);
         }
 
-        return returnCustomNumber;
+        return retVal;
     }
 
 
