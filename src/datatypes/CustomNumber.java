@@ -294,27 +294,21 @@ public class CustomNumber {
             String j = String.valueOf(k);
             returnString.append(j);
         }
-        //TODO SIMPLIFY IF TO ELSE IF CHAIN
-        if (lengthBeforeComma < 0 || lengthAfterComma < 0) {
 
-            if (lengthAfterComma < 0) {
-                returnString.append("*".repeat(Math.max(0, (lengthAfterComma * -1))));
-                returnString.append(".");
+        if (lengthAfterComma < 0) {
+            returnString.append("*".repeat(Math.max(0, (lengthAfterComma * -1))));
+            returnString.append(".");
+        } else if (lengthBeforeComma < 0) {
+            for (int i = 0; i < (lengthBeforeComma * -1); i++) {
+                returnString.insert(0, "*");
             }
-
-            if (lengthBeforeComma < 0) {
-                for (int i = 0; i < (lengthBeforeComma * -1); i++) {
-                    returnString.insert(0, "*");
-                }
-                returnString.insert(0, ".");
-            }
+            returnString.insert(0, ".");
         } else {
             String b = returnString.substring(0, lengthBeforeComma);
             String c = returnString.substring(lengthBeforeComma, getDataLength());
             returnString = new StringBuilder(b + "." + c);
         }
 
-        //TODO REWORK THIS
         if (isPos() || isZero()) {
             returnString.insert(0, "+");
         } else {
