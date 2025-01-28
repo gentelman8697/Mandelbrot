@@ -101,7 +101,7 @@ public class Window {
         testArray.reSize(120,120);
 
         //testArray.reSize(frame.getWidth() - 12, frame.getHeight() - 35);
-        // -26 und -71 für ein genaues Einpassen ins JFrame
+        // -26 und -71 fï¿½r ein genaues Einpassen ins JFrame
 
 
         img = resizeImage(img, testArray.getArrLenX(), testArray.getArrLenY());
